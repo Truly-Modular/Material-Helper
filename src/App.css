@@ -7,6 +7,10 @@
   --discord-gray-4: #1e2124; /* Discord's primary blue color */
 }
 
+body {
+  background-color:"--discord-gray-1"; /* Replace #ffffff with the color code or name of your desired background color */
+}
+
 /* styles.css */
 
 /* styles.css */
@@ -27,7 +31,6 @@
   align-items: flex-start; /* Align entries to the left */
   padding: 20px;
   background-color: var(--discord-gray-1);
-  height: 100vh; /* Stretch the entry list to the bottom of the screen */
 }
 
 #display {
@@ -37,7 +40,6 @@
   padding: 20px;
   background-color: var(--discord-gray-1);
   color: var(--discord-white);
-  height: 100vh;
   width: 100vw; /* Stretch the entry list to the bottom of the screen */
 }
 
@@ -48,7 +50,6 @@
   padding: 20px;
   background-color: var(--discord-gray-1);
   color: var(--discord-white);
-  height: 100vh;
   width: 420px; /* Stretch the entry list to the bottom of the screen */
 }
 

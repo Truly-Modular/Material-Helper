@@ -1,9 +1,9 @@
 import React, { useState } from 'react'
 
 interface IntegerSliderEntryProps {
-	label: string;
-	value: number;
-	onChange: (value: number) => void;
+	label: string
+	value: number
+	onChange: (value: number) => void
 }
 
 const IntegerSliderEntry: React.FC<IntegerSliderEntryProps> = ({ label, value, onChange }) => {
@@ -13,7 +13,7 @@ const IntegerSliderEntry: React.FC<IntegerSliderEntryProps> = ({ label, value, o
 				style={{
 					color: 'var(--discord-white)',
 					marginRight: '10px',
-					width: '30%'
+					width: '27%'
 				}}
 			>
 				{label}:
@@ -31,6 +31,12 @@ const IntegerSliderEntry: React.FC<IntegerSliderEntryProps> = ({ label, value, o
 					height: '50%'
 				}}
 			/>
+			<div
+				style={{
+					color: 'var(--discord-white)',
+					width: '3%'
+				}}
+			></div>
 			<input
 				type="text"
 				value={value}

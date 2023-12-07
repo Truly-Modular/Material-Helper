@@ -59,7 +59,7 @@ const StatBoxComponent: React.FC<StatBox> = ({ sliderValues, colorPalette, trans
 				<div id="display-list" style={{ flex: 1 }}>
 					<CustomComponent
 						imageProps={{
-							imageUrl: '/images/sword.png',
+							imageUrl: process.env.PUBLIC_URL + '/images/sword.png',
 							colorPalette: colorPalette
 						}}
 						headerText={translation + 'Sword'}
@@ -67,7 +67,7 @@ const StatBoxComponent: React.FC<StatBox> = ({ sliderValues, colorPalette, trans
 					/>
 					<CustomComponent
 						imageProps={{
-							imageUrl: '/images/axe.png',
+							imageUrl: process.env.PUBLIC_URL + '/images/axe.png',
 							colorPalette: colorPalette
 						}}
 						headerText={translation + 'Axe'}
@@ -85,7 +85,7 @@ const StatBoxComponent: React.FC<StatBox> = ({ sliderValues, colorPalette, trans
 				<div id="display-list" style={{ flex: 2 }}>
 					<CustomComponent
 						imageProps={{
-							imageUrl: '/images/helmet.png',
+							imageUrl: process.env.PUBLIC_URL + '/images/helmet.png',
 							colorPalette: colorPalette
 						}}
 						headerText={translation + 'Helmet'}
@@ -113,7 +113,7 @@ const StatBoxComponent: React.FC<StatBox> = ({ sliderValues, colorPalette, trans
 					/>
 					<CustomComponent
 						imageProps={{
-							imageUrl: '/images/chestplate.png',
+							imageUrl: process.env.PUBLIC_URL + '/images/chestplate.png',
 							colorPalette: colorPalette
 						}}
 						headerText={translation + 'Chestplate'}
@@ -141,7 +141,7 @@ const StatBoxComponent: React.FC<StatBox> = ({ sliderValues, colorPalette, trans
 					/>
 					<CustomComponent
 						imageProps={{
-							imageUrl: '/images/leggings.png',
+							imageUrl: process.env.PUBLIC_URL + '/images/leggings.png',
 							colorPalette: colorPalette
 						}}
 						headerText={translation + 'Leggings'}
@@ -171,7 +171,7 @@ const StatBoxComponent: React.FC<StatBox> = ({ sliderValues, colorPalette, trans
 					/>
 					<CustomComponent
 						imageProps={{
-							imageUrl: '/images/boots.png',
+							imageUrl: process.env.PUBLIC_URL + '/images/boots.png',
 							colorPalette: colorPalette
 						}}
 						headerText={translation + 'Boots'}
