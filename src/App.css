@@ -1,3 +1,76 @@
+:root {
+  --discord-white: #ffffff; /* Discord's white color */
+  --discord-blue: #7289DA; /* Discord's primary blue color */
+  --discord-gray-1: #424549; /* Discord's primary blue color */
+  --discord-gray-2: #36393e; /* Discord's primary blue color */
+  --discord-gray-3:	#282b30; /* Discord's primary blue color */
+  --discord-gray-4: #1e2124; /* Discord's primary blue color */
+}
+
+/* styles.css */
+
+/* styles.css */
+
+.Top-banner {
+  background-color: var(--discord-gray-3);
+  color: var(--discord-white);
+  text-align: left; /* Align text to the left */
+  padding: 20px; /* Increase header padding for a larger header */
+  display: flex;
+  justify-content: space-between; /* Add space between text and the right edge */
+  align-items: center; /* Center vertically */
+}
+
+#entry-list {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start; /* Align entries to the left */
+  padding: 20px;
+  background-color: var(--discord-gray-1);
+  height: 100vh; /* Stretch the entry list to the bottom of the screen */
+}
+
+#display {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start; /* Align entries to the left */
+  padding: 20px;
+  background-color: var(--discord-gray-1);
+  color: var(--discord-white);
+  height: 100vh;
+  width: 100vw; /* Stretch the entry list to the bottom of the screen */
+}
+
+#display-list {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start; /* Align entries to the left */
+  padding: 20px;
+  background-color: var(--discord-gray-1);
+  color: var(--discord-white);
+  height: 100vh;
+  width: 420px; /* Stretch the entry list to the bottom of the screen */
+}
+
+.entry {
+  margin-bottom: 10px;
+  padding: 10px;
+  background-color: var(--discord-gray-2);
+  width: 500px;
+  text-align: left;
+  color: var(--discord-white);
+}
+
+#entry {
+  margin-bottom: 10px;
+  padding: 10px;
+  width: 400px;
+  background-color: var(--discord-gray-2);
+  text-align: left;
+  color: var(--discord-white);
+}
+
+
 .App {
   text-align: center;
 }
@@ -14,18 +87,18 @@
 }
 
 .App-header {
-  background-color: #282c34;
+  background-color: var(--discord-gray-1);
   min-height: 100vh;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
   font-size: calc(10px + 2vmin);
-  color: white;
+  color: var(--discord-white);
 }
 
 .App-link {
-  color: #61dafb;
+  color: var(--discord-blue);
 }
 
 @keyframes App-logo-spin {
