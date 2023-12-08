@@ -63,7 +63,7 @@ const StatBoxComponent: React.FC<StatBox> = ({ sliderValues, colorPalette, trans
 							colorPalette: colorPalette
 						}}
 						headerText={translation + 'Sword'}
-						lines={[{ text: 'Attack Damage : ' + sliderValues.hardness + 1 }, { text: 'Attack Speed  : 1.6' }]}
+						lines={[{ text: 'Attack Damage : ' + (sliderValues.hardness + 1).toFixed(2) }, { text: 'Attack Speed  : 1.6' }]}
 					/>
 					<CustomComponent
 						imageProps={{

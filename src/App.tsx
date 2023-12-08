@@ -6,6 +6,7 @@ import ColorPickerGroup from './Components/ColorPicker/ColorPickerGroup'
 import MaterialGroups from './Components/TextInputs/MaterialGroupsProps'
 import StatBoxComponent from './Components/Displays/StatDisplays'
 import MaterialImage from './Components/Displays/MaterialImageProp'
+import Warning from './Components/SelfDeletingWarning'
 import JSZip from 'jszip'
 import './App.css'
 
@@ -27,7 +28,7 @@ const App: React.FC<AppProps> = () => {
 	const [colorPalette, setColorPalette] = useState<string[]>(['#000000', '#181818', '#444444', '#6b6b6b', '#969696', '#bebebe', '#d8d8d8', '#ffffff'])
 
 	const [sliderValues, setSliderValues] = useState<AppSliderState>({
-		hardness: 6,
+		hardness: 5,
 		density: 3.8,
 		flexibility: 1,
 		durability: 256,
@@ -108,11 +109,9 @@ const App: React.FC<AppProps> = () => {
 	}
 
 	function isValidMaterial(): boolean {
-		let test = materialId.includes(':') && materialId.split(':').length === 2 && materialDisplayName !== ''
+		let test = materialId.includes(':') && materialId.split(':')[1].length > 0 && materialDisplayName !== ''
 		return test
 	}
-
-	function warnUnfinishedData(): void {}
 
 	function generateResourcePack(): void {
 		if (!isValidMaterial()) {
@@ -183,6 +182,23 @@ const App: React.FC<AppProps> = () => {
 		})
 	}
 
+	const [warnings, setWarnings] = useState<{ id: number; message: string }[]>([])
+	const [warningIdCounter, setWarningIdCounter] = useState(0)
+
+	function warnUnfinishedData(): void {
+		const newWarning = {
+			id: warningIdCounter,
+			message: 'You need to Set the Material id to a valid ID modID:itemID!\nAlso the Name cannot be Empty'
+		}
+
+		setWarnings((prevWarnings) => [...prevWarnings, newWarning])
+		setWarningIdCounter((prevCounter) => prevCounter + 1)
+	}
+
+	function removeWarning(id: number): void {
+		setWarnings((prevWarnings) => prevWarnings.filter((warning) => warning.id !== id))
+	}
+
 	return (
 		<div>
 			<div className="Top-banner">Truly Modular Material Helper</div>
@@ -204,6 +220,11 @@ const App: React.FC<AppProps> = () => {
 							Copy Json to Clipboard
 						</button>
 					</div>
+				</div>
+				<div style={{ position: 'fixed', top: 0, right: 0, zIndex: 9999 }}>
+					{warnings.map((warning) => (
+						<Warning key={warning.id} id={warning.id} message={warning.message} onRemove={removeWarning} />
+					))}
 				</div>
 				<StatBoxComponent sliderValues={sliderValues} colorPalette={colorPalette} translation={materialDisplayName} />
 			</div>
