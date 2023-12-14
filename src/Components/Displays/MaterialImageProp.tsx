@@ -97,15 +97,12 @@ const MaterialImage: React.FC<MaterialImageProp> = ({ imageUrl, colorPalette, st
 	}
 
 	const recalculateImage = () => {
-		console.log('attemtping redraw')
 		if (!isImageLoaded) return
 
 		const canvas = canvasRef.current
 		if (!canvas) return
-		console.log('attemtping redraw')
 		const ctx = canvas.getContext('2d')
 		if (!ctx) return
-		console.log('attemtping redraw')
 		const image = new Image()
 		image.src = imageUrl
 

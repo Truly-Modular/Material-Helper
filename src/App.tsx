@@ -78,9 +78,9 @@ const App: React.FC<AppProps> = () => {
 	}
 
 	const handleSliderSubmit = (newSliderValues: Record<keyof AppSliderState, number>) => {
+		console.log(newSliderValues)
 		// Handle the submission of slider values
 		setSliderValues((prevValues) => ({
-			...prevValues,
 			...newSliderValues
 		}))
 	}

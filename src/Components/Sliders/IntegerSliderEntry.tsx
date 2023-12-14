@@ -22,7 +22,10 @@ const IntegerSliderEntry: React.FC<IntegerSliderEntryProps> = ({ label, value, o
 				type="range"
 				value={value}
 				defaultValue={value}
-				onChange={(e) => onChange(parseInt(e.target.value, 10))}
+				onChange={(e) => {
+					console.log(e.target.value)
+					onChange(parseInt(e.target.value, 10))
+				}}
 				min={0}
 				max={5}
 				style={{
