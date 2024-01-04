@@ -211,7 +211,7 @@ const App: React.FC<AppProps> = () => {
 					<ColorPickerGroup initialColors={colorPalette} onSubmit={handleColorPaletteSubmit} />
 					<div style={{ ...rootStyle, display: 'flex', flexDirection: 'row' }}>
 						<button style={buttonStyle} onClick={() => generateResourcePack()}>
-							Download Resource Pack
+							Download Data Pack
 						</button>
 						<button style={buttonStyle} onClick={() => generateMaterialJSON()}>
 							Download Material Json
