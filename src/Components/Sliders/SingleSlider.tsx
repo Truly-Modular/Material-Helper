@@ -1,43 +1,72 @@
-import React, { ChangeEvent, useEffect, useState } from 'react'
+import React, { ChangeEvent, useEffect, useState } from "react"
 
 interface SingleSliderProps {
 	label: string
 	value: number
 	onChange: (value: number) => void
+	editableLabel?: boolean
+	onLabelChange?: (value: string) => void
 }
 
-const SingleSlider: React.FC<SingleSliderProps> = ({ label, value, onChange }) => {
-	const [textvalue, setText] = useState('' + value)
+const SingleSlider: React.FC<SingleSliderProps> = ({
+	label,
+	value,
+	onChange,
+	editableLabel,
+	onLabelChange,
+}) => {
+	const [textvalue, setText] = useState("" + value)
 	function textParse(test: string): void {
-		if (test.endsWith('.') || test.endsWith(',')) {
+		if (test.endsWith(".") || test.endsWith(",") || test === "-") {
 			setText(test)
 			//onChange(parseFloat(test))
 		} else {
-			setText('' + parseFloat(test))
-			onChange(parseFloat(test))
+			// Remove all characters that are not numbers, commas, periods, or hyphens
+			test = test.replace(/[^0-9,.\-]/g, "")
+
+			if (test.length === 0) test = "0"
+
+			const parsed = parseFloat(test)
+			if (isNaN(parsed)) return
+
+			setText(test) // Directly set 'test' as the text
+			onChange(parsed)
 		}
 	}
 
 	function sliderUpdate(test: string): void {
 		onChange(parseFloat(test))
-		setText('' + parseFloat(test))
+		setText("" + parseFloat(test))
 	}
 
-	useEffect(() => {
-		console.log(`Value changed to: ${value}`)
-	}, [value]) // Specify 'value' as a dependency
-
 	return (
-		<div style={{ marginBottom: '20px', display: 'flex', alignItems: 'center' }}>
-			<label
-				style={{
-					color: 'var(--discord-white)',
-					marginRight: '10px',
-					width: '27%'
-				}}
-			>
-				{label}:
-			</label>
+		<div style={{ marginBottom: "20px", display: "flex", alignItems: "center" }}>
+			{editableLabel ? (
+				<input
+					type="text"
+					value={label}
+					style={{
+						backgroundColor: "var(--discord-gray-3)",
+						color: "var(--discord-white)",
+						border: "none",
+						width: "21%",
+						marginRight: "10px",
+					}}
+					onChange={(event) => {
+						onLabelChange?.(event.target.value)
+					}}
+				/>
+			) : (
+				<label
+					style={{
+						color: "var(--discord-white)",
+						marginRight: "10px",
+						width: "27%",
+					}}
+				>
+					{label}:
+				</label>
+			)}
 			<input
 				type="range"
 				value={value}
@@ -47,15 +76,15 @@ const SingleSlider: React.FC<SingleSliderProps> = ({ label, value, onChange }) =
 				max={15}
 				step={0.01} // Set a step value to allow for two decimal places
 				style={{
-					backgroundColor: 'transparent',
-					width: '60%',
-					height: '50%'
+					backgroundColor: "transparent",
+					width: editableLabel ? "62%" : "60%",
+					height: "50%",
 				}}
 			/>
 			<div
 				style={{
-					color: 'var(--discord-white)',
-					width: '3%'
+					color: "var(--discord-white)",
+					width: "3%",
 				}}
 			></div>
 			<input
@@ -63,10 +92,10 @@ const SingleSlider: React.FC<SingleSliderProps> = ({ label, value, onChange }) =
 				value={textvalue}
 				onChange={(e: ChangeEvent<HTMLInputElement>) => textParse(e.target.value)}
 				style={{
-					backgroundColor: 'var(--discord-gray-3)',
-					color: 'var(--discord-white)',
-					border: 'none',
-					width: '10%'
+					backgroundColor: "var(--discord-gray-3)",
+					color: "var(--discord-white)",
+					border: "none",
+					width: "10%",
 				}}
 			/>
 		</div>

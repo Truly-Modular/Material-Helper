@@ -13,12 +13,7 @@ import "./App.css"
 interface AppProps {}
 
 interface AppSliderState {
-	hardness: number
-	density: number
-	flexibility: number
-	durability: number
-	mining_speed: number
-	mining_level: number
+	[key: string]: number | string
 }
 
 const App: React.FC<AppProps> = () => {
@@ -49,7 +44,7 @@ const App: React.FC<AppProps> = () => {
 
 	const generateMaterialObject = (): object => {
 		const cleanId = materialId.replace(":", "_")
-		return {
+		const json: any = {
 			key: `website-${cleanId}`,
 			translation: `miapi.material.website-${cleanId}`,
 			icon: {
@@ -58,12 +53,6 @@ const App: React.FC<AppProps> = () => {
 			},
 			fake_translation: materialDisplayName,
 			groups: materialGroups,
-			hardness: sliderValues.hardness,
-			density: sliderValues.density,
-			flexibility: sliderValues.flexibility,
-			durability: sliderValues.durability,
-			mining_speed: sliderValues.mining_speed,
-			mining_level: sliderValues.mining_level,
 			color_palette: isAutoGenerateColors
 				? {
 						type: "image_generated_item",
@@ -91,10 +80,16 @@ const App: React.FC<AppProps> = () => {
 				},
 			],
 		}
+
+		Object.keys(sliderValues).forEach((key: string) => {
+			const value = sliderValues[key as keyof typeof sliderValues]
+			json[key] = value
+		})
+
+		return json
 	}
 
-	const handleSliderSubmit = (newSliderValues: Record<keyof AppSliderState, number>) => {
-		console.log(newSliderValues)
+	const handleSliderSubmit = (newSliderValues: Record<keyof AppSliderState, number | string>) => {
 		// Handle the submission of slider values
 		setSliderValues((prevValues) => ({
 			...newSliderValues,
@@ -278,7 +273,9 @@ const App: React.FC<AppProps> = () => {
 						<div>
 							<h1>Previews</h1>
 							{isAutoGenerateColors && (
-								<div style={{ marginBottom: "5px", color: "#e32727", fontWeight: "bold" }}>
+								<div
+									style={{ marginBottom: "5px", color: "var(--warning-red)", fontWeight: "bold" }}
+								>
 									Previews aren't representing ingame colors anymore, since automatic generation is
 									toggled!
 								</div>

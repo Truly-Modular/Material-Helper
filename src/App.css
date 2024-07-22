@@ -5,6 +5,7 @@
 	--discord-gray-2: #36393e; /* Discord's primary blue color */
 	--discord-gray-3: #282b30; /* Discord's primary blue color */
 	--discord-gray-4: #1e2124; /* Discord's primary blue color */
+	--warning-red: #e32727;
 }
 
 body {
@@ -20,6 +21,15 @@ h1 {
 /* styles.css */
 
 /* styles.css */
+
+.dropdown-item {
+	padding: 5px;
+	cursor: pointer;
+}
+
+.dropdown-item:hover {
+	background-color: var(--discord-gray-2);
+}
 
 .Top-banner {
 	background-color: var(--discord-gray-3);
