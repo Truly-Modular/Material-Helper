@@ -3,25 +3,16 @@ import CustomComponent from "./DisplayComponent"
 import "../.././App.css"
 
 interface StatBox {
-	sliderValues: AppSliderState
+	sliderValues: any
 	colorPalette: string[]
 	translation: string
 }
 
-interface AppSliderState {
-	hardness: number
-	density: number
-	flexibility: number
-	durability: number
-	mining_speed: number
-	mining_level: number
-}
-
 const StatBoxComponent: React.FC<StatBox> = ({ sliderValues, colorPalette, translation }) => {
-	const [localSliderValues, setLocalSliderValues] = useState<AppSliderState>(sliderValues)
+	const [localSliderValues, setLocalSliderValues] = useState<any>(sliderValues)
 
-	const handleSliderChange = (sliderName: keyof AppSliderState, newValue: number) => {
-		setLocalSliderValues((prevValues) => ({ ...prevValues, [sliderName]: newValue }))
+	const handleSliderChange = (sliderName: any, newValue: number) => {
+		setLocalSliderValues((prevValues: any) => ({ ...prevValues, [sliderName]: newValue }))
 	}
 
 	function customPower(x: number, exp: number): number {

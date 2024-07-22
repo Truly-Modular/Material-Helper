@@ -2,14 +2,16 @@ import React, { useState, useEffect, useRef } from "react"
 import SingleSlider from "./SingleSlider"
 import IntegerSliderEntry from "./IntegerSliderEntry"
 import HighLimitSliderEntry from "./HighLimitSliderEntry"
+import StringStatEntry from "./StringStatInput"
 
 interface SliderEntryProps {
-	onSubmit: (sliderValues: Record<string, number>) => void
+	onSubmit: (sliderValues: Record<string, number | string>) => void
 }
 
 enum CustomSliderType {
 	INTEGER,
 	FLOAT,
+	STRING,
 }
 
 const SliderEntry: React.FC<SliderEntryProps> = ({ onSubmit }) => {
@@ -69,7 +71,7 @@ const SliderEntry: React.FC<SliderEntryProps> = ({ onSubmit }) => {
 	}, [isDropdownOpen])
 
 	const handleEntrySubmit = () => {
-		const customSliderValues: { [name: string]: number } = {}
+		const customSliderValues: { [name: string]: number | string } = {}
 		Object.values(customSliders).forEach((slider) => {
 			customSliderValues[slider.name] = slider.value
 		})
@@ -110,6 +112,33 @@ const SliderEntry: React.FC<SliderEntryProps> = ({ onSubmit }) => {
 				case CustomSliderType.INTEGER:
 					sliderComponent = (
 						<IntegerSliderEntry
+							label={slider.name}
+							value={slider.value}
+							onChange={(value) => {
+								setCustomSliders((prev) => ({
+									...prev,
+									[slider.id]: {
+										...slider,
+										value,
+									},
+								}))
+							}}
+							editableLabel={true}
+							onLabelChange={(value) => {
+								setCustomSliders((prev) => ({
+									...prev,
+									[slider.id]: {
+										...slider,
+										name: value,
+									},
+								}))
+							}}
+						/>
+					)
+					break
+				case CustomSliderType.STRING:
+					sliderComponent = (
+						<StringStatEntry
 							label={slider.name}
 							value={slider.value}
 							onChange={(value) => {
@@ -252,7 +281,7 @@ const SliderEntry: React.FC<SliderEntryProps> = ({ onSubmit }) => {
 												[uuid]: {
 													id: uuid,
 													name: "new",
-													value: 0,
+													value: key === "STRING" ? "" : 0,
 													type: CustomSliderType[key as keyof typeof CustomSliderType],
 												},
 											})

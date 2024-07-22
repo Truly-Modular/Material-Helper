@@ -13,12 +13,7 @@ import "./App.css"
 interface AppProps {}
 
 interface AppSliderState {
-	hardness: number
-	density: number
-	flexibility: number
-	durability: number
-	mining_speed: number
-	mining_level: number
+	[key: string]: number | string
 }
 
 const App: React.FC<AppProps> = () => {
@@ -94,7 +89,7 @@ const App: React.FC<AppProps> = () => {
 		return json
 	}
 
-	const handleSliderSubmit = (newSliderValues: Record<keyof AppSliderState, number>) => {
+	const handleSliderSubmit = (newSliderValues: Record<keyof AppSliderState, number | string>) => {
 		// Handle the submission of slider values
 		setSliderValues((prevValues) => ({
 			...newSliderValues,
