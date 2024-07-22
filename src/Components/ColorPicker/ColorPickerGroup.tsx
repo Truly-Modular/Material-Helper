@@ -4,9 +4,16 @@ import ColorPicker from "./ColoPickerProps"
 interface ColorPickerGroupProps {
 	initialColors: string[]
 	onSubmit?: (colors: string[]) => void
+	setColorAutoGenerate: (checked: boolean) => void
+	autoGenerateColors: boolean
 }
 
-const ColorPickerGroup: React.FC<ColorPickerGroupProps> = ({ initialColors, onSubmit }) => {
+const ColorPickerGroup: React.FC<ColorPickerGroupProps> = ({
+	initialColors,
+	onSubmit,
+	setColorAutoGenerate,
+	autoGenerateColors,
+}) => {
 	const [gradientColors, setGradientColors] = useState<string[]>(initialColors)
 
 	const handleColorChange = (index: number, newColor: string) => {
@@ -36,7 +43,11 @@ const ColorPickerGroup: React.FC<ColorPickerGroupProps> = ({ initialColors, onSu
 					}}
 				>
 					<label>Generate Automatically</label>
-					<input type="checkbox" />
+					<input
+						type="checkbox"
+						checked={autoGenerateColors}
+						onChange={(e) => setColorAutoGenerate(e.target.checked)}
+					/>
 				</div>
 				<div
 					style={{
@@ -52,6 +63,7 @@ const ColorPickerGroup: React.FC<ColorPickerGroupProps> = ({ initialColors, onSu
 							key={index}
 							initialColor={color}
 							onChange={(newColor) => handleColorChange(index, newColor)}
+							disabled={autoGenerateColors}
 						/>
 					))}
 				</div>
@@ -63,6 +75,9 @@ const ColorPickerGroup: React.FC<ColorPickerGroupProps> = ({ initialColors, onSu
 						height: "50px", // Adjust the height as needed
 						background: gradientBackground,
 						borderRadius: "8px", // Optional: Add rounded corners
+						filter: autoGenerateColors ? "grayscale(100%)" : "none",
+						opacity: autoGenerateColors ? 0.5 : 1,
+						position: "relative",
 					}}
 				/>
 			</div>

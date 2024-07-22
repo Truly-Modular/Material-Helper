@@ -45,6 +45,8 @@ const App: React.FC<AppProps> = () => {
 		mining_level: 5,
 	})
 
+	const [isAutoGenerateColors, setIsAutoGenerateColors] = useState(false)
+
 	const generateMaterialObject = (): object => {
 		const cleanId = materialId.replace(":", "_")
 		return {
@@ -62,21 +64,26 @@ const App: React.FC<AppProps> = () => {
 			durability: sliderValues.durability,
 			mining_speed: sliderValues.mining_speed,
 			mining_level: sliderValues.mining_level,
-			color_palette: {
-				type: "grayscale_map",
-				colors: colorPalette.reduce((acc, color, index, array) => {
-					const step = Math.round(255 / (array.length - 1))
-					acc[Math.round(step * index)] = color.substr(1) // Remove # from color
+			color_palette: isAutoGenerateColors
+				? {
+						type: "image_generated_item",
+						item: `${materialId}`,
+				  }
+				: {
+						type: "grayscale_map",
+						colors: colorPalette.reduce((acc, color, index, array) => {
+							const step = Math.round(255 / (array.length - 1))
+							acc[Math.round(step * index)] = color.substr(1) // Remove # from color
 
-					// Ensure the last entry is always at 255
-					if (index === array.length - 1) {
-						acc[255] = color.substr(1)
-					}
+							// Ensure the last entry is always at 255
+							if (index === array.length - 1) {
+								acc[255] = color.substr(1)
+							}
 
-					return acc
-				}, {} as Record<string, string>),
-				filler: "interpolate",
-			},
+							return acc
+						}, {} as Record<string, string>),
+						filler: "interpolate",
+				  },
 			items: [
 				{
 					item: materialId,
@@ -255,7 +262,12 @@ const App: React.FC<AppProps> = () => {
 								<MaterialGroups onSubmit={handleMaterialGroupsSubmit} />
 							</div>
 						</div>
-						<ColorPickerGroup initialColors={colorPalette} onSubmit={handleColorPaletteSubmit} />
+						<ColorPickerGroup
+							initialColors={colorPalette}
+							onSubmit={handleColorPaletteSubmit}
+							setColorAutoGenerate={setIsAutoGenerateColors}
+							autoGenerateColors={isAutoGenerateColors}
+						/>
 					</div>
 
 					<div style={{ display: "flex", gap: "20px" }}>
@@ -263,11 +275,20 @@ const App: React.FC<AppProps> = () => {
 							<h1>Stats</h1>
 							<SliderEntry onSubmit={handleSliderSubmit} />
 						</div>
-						<StatBoxComponent
-							sliderValues={sliderValues}
-							colorPalette={colorPalette}
-							translation={materialDisplayName}
-						/>
+						<div>
+							<h1>Previews</h1>
+							{isAutoGenerateColors && (
+								<div style={{ marginBottom: "5px", color: "#e32727", fontWeight: "bold" }}>
+									Previews aren't representing ingame colors anymore, since automatic generation is
+									toggled!
+								</div>
+							)}
+							<StatBoxComponent
+								sliderValues={sliderValues}
+								colorPalette={colorPalette}
+								translation={materialDisplayName}
+							/>
+						</div>
 					</div>
 				</div>
 				<div style={{ position: "fixed", top: 0, right: 0, zIndex: 9999 }}>

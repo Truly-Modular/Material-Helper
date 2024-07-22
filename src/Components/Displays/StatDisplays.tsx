@@ -57,7 +57,6 @@ const StatBoxComponent: React.FC<StatBox> = ({ sliderValues, colorPalette, trans
 
 	return (
 		<div id="display">
-			<h1>Previews</h1>
 			<div style={{ display: "flex", gap: "20px" }}>
 				<div id="display-list" style={{ flex: 1 }}>
 					<CustomComponent
