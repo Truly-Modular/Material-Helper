@@ -1,14 +1,20 @@
 :root {
-  --discord-white: #ffffff; /* Discord's white color */
-  --discord-blue: #7289DA; /* Discord's primary blue color */
-  --discord-gray-1: #424549; /* Discord's primary blue color */
-  --discord-gray-2: #36393e; /* Discord's primary blue color */
-  --discord-gray-3:	#282b30; /* Discord's primary blue color */
-  --discord-gray-4: #1e2124; /* Discord's primary blue color */
+	--discord-white: #ffffff; /* Discord's white color */
+	--discord-blue: #7289da; /* Discord's primary blue color */
+	--discord-gray-1: #424549; /* Discord's primary blue color */
+	--discord-gray-2: #36393e; /* Discord's primary blue color */
+	--discord-gray-3: #282b30; /* Discord's primary blue color */
+	--discord-gray-4: #1e2124; /* Discord's primary blue color */
 }
 
 body {
-  background-color:"--discord-gray-1"; /* Replace #ffffff with the color code or name of your desired background color */
+	background-color: "--discord-gray-1"; /* Replace #ffffff with the color code or name of your desired background color */
+}
+
+h1 {
+	color: var(--discord-white);
+	margin: 0;
+	padding: 10px 0;
 }
 
 /* styles.css */
@@ -16,97 +22,102 @@ body {
 /* styles.css */
 
 .Top-banner {
-  background-color: var(--discord-gray-3);
-  color: var(--discord-white);
-  text-align: left; /* Align text to the left */
-  padding: 20px; /* Increase header padding for a larger header */
-  display: flex;
-  justify-content: space-between; /* Add space between text and the right edge */
-  align-items: center; /* Center vertically */
+	background-color: var(--discord-gray-3);
+	color: var(--discord-white);
+	text-align: left; /* Align text to the left */
+	padding: 20px; /* Increase header padding for a larger header */
+	display: flex;
+	justify-content: space-between; /* Add space between text and the right edge */
+	align-items: center; /* Center vertically */
 }
 
 #entry-list {
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start; /* Align entries to the left */
-  padding: 20px;
-  background-color: var(--discord-gray-1);
+	display: flex;
+	flex-direction: column;
+	align-items: flex-start; /* Align entries to the left */
+	background-color: var(--discord-gray-1);
 }
 
 #display {
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start; /* Align entries to the left */
-  padding: 20px;
-  background-color: var(--discord-gray-1);
-  color: var(--discord-white);
-  width: 100vw; /* Stretch the entry list to the bottom of the screen */
+	display: flex;
+	flex-direction: column;
+	align-items: flex-start; /* Align entries to the left */
+	background-color: var(--discord-gray-1);
+	color: var(--discord-white);
+	/* width: 100vw; Stretch the entry list to the bottom of the screen */
 }
 
 #display-list {
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start; /* Align entries to the left */
-  padding: 20px;
-  background-color: var(--discord-gray-1);
-  color: var(--discord-white);
-  width: 420px; /* Stretch the entry list to the bottom of the screen */
+	display: flex;
+	flex-direction: column;
+	align-items: flex-start; /* Align entries to the left */
+	background-color: var(--discord-gray-1);
+	color: var(--discord-white);
+	width: 420px; /* Stretch the entry list to the bottom of the screen */
 }
 
 .entry {
-  margin-bottom: 10px;
-  padding: 10px;
-  background-color: var(--discord-gray-2);
-  width: 500px;
-  text-align: left;
-  color: var(--discord-white);
+	/* margin-bottom: 10px; */
+	padding: 10px;
+	background-color: var(--discord-gray-2);
+	width: 500px;
+	text-align: left;
+	color: var(--discord-white);
+	display: flex;
+	flex-direction: column;
+	gap: 5px;
+	border-radius: 8px;
+}
+
+.special-text {
+	width: 237.5px !important;
 }
 
 #entry {
-  margin-bottom: 10px;
-  padding: 10px;
-  width: 400px;
-  background-color: var(--discord-gray-2);
-  text-align: left;
-  color: var(--discord-white);
+	margin-bottom: 10px;
+	padding: 10px;
+	width: 400px;
+	background-color: var(--discord-gray-2);
+	text-align: left;
+	color: var(--discord-white);
+	border-radius: 8px;
 }
 
-
 .App {
-  text-align: center;
+	text-align: center;
 }
 
 .App-logo {
-  height: 40vmin;
-  pointer-events: none;
+	height: 40vmin;
+	pointer-events: none;
 }
 
 @media (prefers-reduced-motion: no-preference) {
-  .App-logo {
-    animation: App-logo-spin infinite 20s linear;
-  }
+	.App-logo {
+		animation: App-logo-spin infinite 20s linear;
+	}
 }
 
 .App-header {
-  background-color: var(--discord-gray-1);
-  min-height: 100vh;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  font-size: calc(10px + 2vmin);
-  color: var(--discord-white);
+	background-color: var(--discord-gray-1);
+	min-height: 100vh;
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	justify-content: center;
+	font-size: calc(10px + 2vmin);
+	color: var(--discord-white);
 }
 
 .App-link {
-  color: var(--discord-blue);
+	color: var(--discord-blue);
 }
 
 @keyframes App-logo-spin {
-  from {
-    transform: rotate(0deg);
-  }
-  to {
-    transform: rotate(360deg);
-  }
+	from {
+		transform: rotate(0deg);
+	}
+	to {
+		transform: rotate(360deg);
+	}
 }
