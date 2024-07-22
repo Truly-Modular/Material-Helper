@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect } from "react"
 
 interface WarningProps {
 	id: number
@@ -18,10 +18,10 @@ const Warning: React.FC<WarningProps> = ({ id, message, onRemove }) => {
 	return (
 		<div
 			style={{
-				backgroundColor: 'red',
-				color: 'white',
-				padding: '10px',
-				marginBottom: '5px'
+				backgroundColor: "red",
+				color: "white",
+				padding: "10px",
+				marginBottom: "5px",
 			}}
 		>
 			{message}
