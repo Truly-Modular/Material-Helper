@@ -9,6 +9,7 @@ import MaterialImage from "./Components/Displays/MaterialImageProp"
 import Warning from "./Components/SelfDeletingWarning"
 import JSZip from "jszip"
 import "./App.css"
+import ToggleButton from "./Components/Buttons/ToggleButton"
 
 interface AppProps {}
 
@@ -30,6 +31,8 @@ const App: React.FC<AppProps> = () => {
 		"#d8d8d8",
 		"#ffffff",
 	])
+
+	const [is121Plus, setIs121Plus] = useState(false)
 
 	const [sliderValues, setSliderValues] = useState<AppSliderState>({
 		hardness: 5,
@@ -135,7 +138,8 @@ const App: React.FC<AppProps> = () => {
 
 		// Add folders
 		const dataFolder = zip.folder("data")
-		const miapiFolder = dataFolder?.folder("miapi")
+		const websiteFolder = is121Plus ? dataFolder?.folder("website") : undefined
+		const miapiFolder = is121Plus ? websiteFolder?.folder("miapi") : dataFolder?.folder("miapi")
 		const materialFolder = miapiFolder?.folder("materials")
 		const mcMeta = {
 			pack: {
@@ -195,20 +199,31 @@ const App: React.FC<AppProps> = () => {
 		navigator.clipboard.writeText(jsonData).then(() => {
 			console.log("JSON data copied to clipboard:", jsonData)
 		})
+
+		addWarning("Successfully Copied!", true)
 	}
 
-	const [warnings, setWarnings] = useState<{ id: number; message: string }[]>([])
+	const [warnings, setWarnings] = useState<
+		{ id: number; message: string; isSuccessWarning: boolean }[]
+	>([])
 	const [warningIdCounter, setWarningIdCounter] = useState(0)
 
-	function warnUnfinishedData(): void {
+	const addWarning = (message: string, isSuccessWarning: boolean) => {
 		const newWarning = {
 			id: warningIdCounter,
-			message:
-				"You need to Set the Material id to a valid ID modID:itemID!\nAlso the Name cannot be Empty",
+			message,
+			isSuccessWarning,
 		}
 
 		setWarnings((prevWarnings) => [...prevWarnings, newWarning])
 		setWarningIdCounter((prevCounter) => prevCounter + 1)
+	}
+
+	function warnUnfinishedData(): void {
+		addWarning(
+			"You need to Set the Material id to a valid ID modID:itemID!\nAlso the Name cannot be Empty",
+			false
+		)
 	}
 
 	function removeWarning(id: number): void {
@@ -218,7 +233,24 @@ const App: React.FC<AppProps> = () => {
 	return (
 		<div>
 			<div className="Top-banner">
-				<span>Truly Modular Material Helper</span>
+				<div
+					style={{ display: "flex", justifyContent: "center", alignItems: "center", gap: "10px" }}
+				>
+					<span>Truly Modular Material Helper</span>
+					<div
+						style={{
+							display: "flex",
+							alignItems: "center",
+							gap: "10px",
+							fontSize: "16pt",
+							transform: "scale(75%)",
+						}}
+					>
+						<span>1.20.1</span>
+						<ToggleButton isToggled={is121Plus} setIsToggled={setIs121Plus} />
+						<span>1.21+</span>
+					</div>
+				</div>
 				<div style={{ ...rootStyle, display: "flex", flexDirection: "row" }}>
 					<button style={buttonStyle} onClick={() => generateResourcePack()}>
 						Download Data Pack
@@ -229,8 +261,8 @@ const App: React.FC<AppProps> = () => {
 					<button style={buttonStyle} onClick={() => generateMaterialJSONAndCopy()}>
 						Copy Json to Clipboard
 					</button>
-					<button style={buttonStyle} onClick={() => generateMaterialJSONAndCopy()}>
-						Command Copy thing
+					<button style={buttonStyle} onClick={() => addWarning("Not implemented yet", false)}>
+						Copy /give Command
 					</button>
 				</div>
 			</div>
@@ -295,6 +327,7 @@ const App: React.FC<AppProps> = () => {
 							id={warning.id}
 							message={warning.message}
 							onRemove={removeWarning}
+							isSuccessWarning={warning.isSuccessWarning}
 						/>
 					))}
 				</div>

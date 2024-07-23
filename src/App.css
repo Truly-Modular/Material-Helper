@@ -93,6 +93,35 @@ h1 {
 	border-radius: 8px;
 }
 
+.toggle-switch {
+	width: 60px;
+	height: 30px;
+	background-color: #ccc;
+	border-radius: 30px;
+	position: relative;
+	cursor: pointer;
+	transition: background-color 0.3s;
+}
+
+.toggle-switch.toggled {
+	background-color: var(--discord-blue);
+}
+
+.toggle-knob {
+	width: 28px;
+	height: 28px;
+	background-color: white;
+	border-radius: 50%;
+	position: absolute;
+	top: 1px;
+	left: 1px;
+	transition: left 0.3s;
+}
+
+.toggle-switch.toggled .toggle-knob {
+	left: 31px;
+}
+
 .App {
 	text-align: center;
 }
