@@ -24,9 +24,10 @@ const SingleSlider: React.FC<SingleSliderProps> = ({
 			// Remove all characters that are not numbers, commas, periods, or hyphens
 			test = test.replace(/[^0-9,.\-]/g, "")
 
-			if (test.length === 0) test = "0"
+			// Remove every minus sign that isn't at the start of the string
+			test = test.replace(/(?!^)-/g, "")
 
-			const parsed = parseFloat(test)
+			const parsed = test.length === 0 ? 0 : parseFloat(test)
 			if (isNaN(parsed)) return
 
 			setText(test) // Directly set 'test' as the text
