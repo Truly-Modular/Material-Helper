@@ -320,7 +320,7 @@ const App: React.FC<AppProps> = () => {
 						</div>
 					</div>
 				</div>
-				<div style={{ position: "fixed", top: 0, right: 0, zIndex: 9999 }}>
+				<div style={{ position: "fixed", top: 100, right: 15, zIndex: 9999 }}>
 					{warnings.map((warning) => (
 						<Warning
 							key={warning.id}

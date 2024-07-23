@@ -1,4 +1,4 @@
-import React, { useState } from "react"
+import React, { useEffect, useState } from "react"
 
 interface IntegerSliderEntryProps {
 	label: string
@@ -15,6 +15,30 @@ const IntegerSliderEntry: React.FC<IntegerSliderEntryProps> = ({
 	editableLabel,
 	onLabelChange,
 }) => {
+	const [text, setText] = useState("")
+
+	useEffect(() => {
+		setText(`${value}`)
+	}, [value])
+
+	const textParse = (test: string) => {
+		if (test === "-") {
+			setText(test)
+		} else {
+			// Remove all characters that are not numbers, commas, periods, or hyphens
+			test = test.replace(/[^0-9\-]/g, "")
+
+			// Remove every minus sign that isn't at the start of the string
+			test = test.replace(/(?!^)-/g, "")
+
+			const parsed = test.length === 0 ? 0 : parseInt(test)
+			if (isNaN(parsed)) return
+
+			setText(test) // Directly set 'test' as the text
+			onChange(parsed)
+		}
+	}
+
 	return (
 		<div style={{ marginBottom: "20px", display: "flex", alignItems: "center" }}>
 			{editableLabel ? (
@@ -66,16 +90,9 @@ const IntegerSliderEntry: React.FC<IntegerSliderEntryProps> = ({
 			></div>
 			<input
 				type="text"
-				value={value}
+				value={text}
 				onChange={(e) => {
-					let inputValue = e.target.value
-					if (inputValue === "-") {
-						inputValue = "-1"
-					}
-					const intValue = parseInt(inputValue, 10)
-					if (!isNaN(intValue)) {
-						onChange(intValue)
-					}
+					textParse(e.target.value)
 				}}
 				min={0}
 				max={15}
