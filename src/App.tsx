@@ -236,7 +236,20 @@ const App: React.FC<AppProps> = () => {
 				<div
 					style={{ display: "flex", justifyContent: "center", alignItems: "center", gap: "10px" }}
 				>
-					<span>Truly Modular Material Helper</span>
+					<a
+						style={{
+							display: "flex",
+							alignItems: "center",
+							justifyContent: "center",
+							color: "white",
+						}}
+						href={"https://modrinth.com/organization/truly-modular"}
+						target="_blank"
+						rel="noreferrer"
+					>
+						<img src={process.env.PUBLIC_URL + "/logo_trans.png"} width={40} height={40} />
+						<span>Truly Modular Material Helper</span>
+					</a>
 					<div
 						style={{
 							display: "flex",
