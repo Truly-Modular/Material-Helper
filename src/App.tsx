@@ -242,6 +242,7 @@ const App: React.FC<AppProps> = () => {
 							alignItems: "center",
 							justifyContent: "center",
 							color: "white",
+							fontWeight: "bold",
 						}}
 						href={"https://modrinth.com/organization/truly-modular"}
 						target="_blank"
