@@ -4,10 +4,10 @@ interface WarningProps {
 	id: number
 	message: string
 	onRemove: (id: number) => void
-	isSuccessWarning?: boolean
+	color: string
 }
 
-const Warning: React.FC<WarningProps> = ({ id, message, onRemove, isSuccessWarning }) => {
+const Warning: React.FC<WarningProps> = ({ id, message, onRemove, color }) => {
 	useEffect(() => {
 		const timeoutId = setTimeout(() => {
 			onRemove(id)
@@ -19,7 +19,7 @@ const Warning: React.FC<WarningProps> = ({ id, message, onRemove, isSuccessWarni
 	return (
 		<div
 			style={{
-				backgroundColor: isSuccessWarning ? "green" : "red",
+				backgroundColor: color,
 				color: "white",
 				padding: "10px",
 				marginBottom: "5px",
