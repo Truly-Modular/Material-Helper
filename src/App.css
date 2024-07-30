@@ -29,6 +29,7 @@ a {
 .dropdown-item {
 	padding: 5px;
 	cursor: pointer;
+	color: white
 }
 
 .dropdown-item:hover {

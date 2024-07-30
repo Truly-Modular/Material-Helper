@@ -5,11 +5,11 @@ import SliderEntry from "./Components/Sliders/SliderEntry"
 import ColorPickerGroup from "./Components/ColorPicker/ColorPickerGroup"
 import MaterialGroups from "./Components/TextInputs/MaterialGroupsProps"
 import StatBoxComponent from "./Components/Displays/StatDisplays"
-import MaterialImage from "./Components/Displays/MaterialImageProp"
 import Warning from "./Components/SelfDeletingWarning"
 import JSZip from "jszip"
 import "./App.css"
 import ToggleButton from "./Components/Buttons/ToggleButton"
+import PropertyDisplay from "./Components/Displays/PropertyDisplay"
 
 interface AppProps {}
 
@@ -329,6 +329,11 @@ const App: React.FC<AppProps> = () => {
 							setColorAutoGenerate={setIsAutoGenerateColors}
 							autoGenerateColors={isAutoGenerateColors}
 						/>
+					</div>
+
+					<div style={{width: '100%'}}>
+						<h1>Properties</h1>
+						<PropertyDisplay/>
 					</div>
 
 					<div style={{ display: "flex", gap: "20px" }}>

@@ -44,6 +44,7 @@ const ColorPickerGroup: React.FC<ColorPickerGroupProps> = ({ initialColors, onSu
 					style={{
 						margin: '20px',
 						marginTop: '0px',
+						marginBottom: '15px',
 						display: 'flex',
 						flexDirection: 'row',
 						justifyContent: 'space-between'
