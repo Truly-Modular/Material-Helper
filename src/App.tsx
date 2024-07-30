@@ -200,19 +200,19 @@ const App: React.FC<AppProps> = () => {
 			console.log("JSON data copied to clipboard:", jsonData)
 		})
 
-		addWarning("Successfully Copied!", true)
+		addWarning("Successfully Copied!", 'green')
 	}
 
 	const [warnings, setWarnings] = useState<
-		{ id: number; message: string; isSuccessWarning: boolean }[]
+		{ id: number; message: string; color: string}[]
 	>([])
 	const [warningIdCounter, setWarningIdCounter] = useState(0)
 
-	const addWarning = (message: string, isSuccessWarning: boolean) => {
+	const addWarning = (message: string, color: string) => {
 		const newWarning = {
 			id: warningIdCounter,
 			message,
-			isSuccessWarning,
+			color,
 		}
 
 		setWarnings((prevWarnings) => [...prevWarnings, newWarning])
@@ -222,12 +222,28 @@ const App: React.FC<AppProps> = () => {
 	function warnUnfinishedData(): void {
 		addWarning(
 			"You need to Set the Material id to a valid ID modID:itemID!\nAlso the Name cannot be Empty",
-			false
+			'red'
 		)
 	}
 
 	function removeWarning(id: number): void {
 		setWarnings((prevWarnings) => prevWarnings.filter((warning) => warning.id !== id))
+	}
+
+	const handleGiveButtonPress = () => {
+		let command = ""
+		const materialJson: any = generateMaterialObject()
+		materialJson["parent"] = "iron"
+		delete materialJson["key"]
+		delete materialJson["translation"]
+		if (is121Plus) {
+			command = `/give @p ${materialId}[miapi_material=${JSON.stringify(materialJson)}]`
+		} else {
+			command = `/give @p ${materialId}{miapi_material:${JSON.stringify(materialJson)}}`
+		}
+		navigator.clipboard.writeText(command)
+		console.log(command, materialJson)
+		addWarning("Successfully Copied! You might want to use a command block!", '#fcba03')
 	}
 
 	return (
@@ -275,7 +291,7 @@ const App: React.FC<AppProps> = () => {
 					<button style={buttonStyle} onClick={() => generateMaterialJSONAndCopy()}>
 						Copy Json to Clipboard
 					</button>
-					<button style={buttonStyle} onClick={() => addWarning("Not implemented yet", false)}>
+					<button style={buttonStyle} onClick={() => handleGiveButtonPress()}>
 						Copy /give Command
 					</button>
 				</div>
@@ -341,7 +357,7 @@ const App: React.FC<AppProps> = () => {
 							id={warning.id}
 							message={warning.message}
 							onRemove={removeWarning}
-							isSuccessWarning={warning.isSuccessWarning}
+							color={warning.color}
 						/>
 					))}
 				</div>
