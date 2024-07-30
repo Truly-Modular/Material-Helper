@@ -231,6 +231,10 @@ const App: React.FC<AppProps> = () => {
 	}
 
 	const handleGiveButtonPress = () => {
+		if (!isValidMaterial()) {
+			warnUnfinishedData()
+			return
+		}
 		let command = ""
 		const materialJson: any = generateMaterialObject()
 		materialJson["parent"] = "iron"
