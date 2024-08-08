@@ -1,5 +1,5 @@
-import React, { useState, useEffect, useRef } from "react"
-import { SketchPicker, ColorResult } from "react-color"
+import React, { useState, useEffect, useRef } from 'react'
+import { SketchPicker, ColorResult } from 'react-color'
 
 interface ColorPickerProps {
 	initialColor: string
@@ -19,10 +19,11 @@ const ColorPicker: React.FC<ColorPickerProps> = ({ initialColor, onChange, disab
 			}
 		}
 
-		document.addEventListener("click", handleClickOutside)
+		document.addEventListener('click', handleClickOutside)
+		console.log('init ' + initialColor)
 
 		return () => {
-			document.removeEventListener("click", handleClickOutside)
+			document.removeEventListener('click', handleClickOutside)
 		}
 	}, [])
 
@@ -42,25 +43,25 @@ const ColorPicker: React.FC<ColorPickerProps> = ({ initialColor, onChange, disab
 	}
 
 	return (
-		<div style={{ position: "relative", display: "inline-block" }} ref={colorPickerRef}>
+		<div style={{ position: 'relative', display: 'inline-block' }} ref={colorPickerRef}>
 			<div
 				style={{
 					backgroundColor: color,
-					width: "40px",
-					height: "40px",
-					cursor: disabled ? "not-allowed" : "pointer",
-					filter: disabled ? "grayscale(100%)" : "none",
-					opacity: disabled ? 0.5 : 1,
+					width: '40px',
+					height: '40px',
+					cursor: disabled ? 'not-allowed' : 'pointer',
+					filter: disabled ? 'grayscale(100%)' : 'none',
+					opacity: disabled ? 0.5 : 1
 				}}
 				onClick={handleColorClick}
 			/>
 			{showPicker && !disabled && (
 				<div
 					style={{
-						position: "absolute",
+						position: 'absolute',
 						zIndex: 2,
-						top: "50px", // Adjust the position as needed
-						left: "0",
+						top: '50px', // Adjust the position as needed
+						left: '0'
 					}}
 				>
 					<SketchPicker color={color} onChange={handleColorChange} />
@@ -69,14 +70,14 @@ const ColorPicker: React.FC<ColorPickerProps> = ({ initialColor, onChange, disab
 			{disabled && (
 				<div
 					style={{
-						position: "absolute",
+						position: 'absolute',
 						top: 0,
 						left: 0,
-						width: "100%",
-						height: "100%",
-						backgroundColor: "rgba(128, 128, 128, 0.5)",
+						width: '100%',
+						height: '100%',
+						backgroundColor: 'rgba(128, 128, 128, 0.5)',
 						zIndex: 1,
-						pointerEvents: "none",
+						pointerEvents: 'none'
 					}}
 				/>
 			)}

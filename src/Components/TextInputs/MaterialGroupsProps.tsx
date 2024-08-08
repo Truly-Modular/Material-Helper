@@ -1,11 +1,33 @@
-import React, { useState, ChangeEvent, useEffect } from "react"
+import React, { useState, ChangeEvent, useEffect } from 'react'
+import { useLoadData } from '../Load/LoadDataProvider'
 
 interface MaterialGroupsProps {
 	onSubmit: (displayNames: string[]) => void
 }
 
 const MaterialGroups: React.FC<MaterialGroupsProps> = ({ onSubmit }) => {
-	const [displayNames, setDisplayNames] = useState(["metal"])
+	const [displayNames, setDisplayNames] = useState(['metal'])
+	const { loadData, addWarning } = useLoadData()
+
+	useEffect(() => {
+		if (loadData != null) {
+			try {
+				if ('groups' in loadData && Array.isArray(loadData.groups)) {
+					const allStrings = loadData.groups.every((item: any) => typeof item === 'string')
+					if (allStrings) {
+						setDisplayNames(loadData.groups)
+						onSubmit(loadData.groups)
+					} else {
+						addWarning('groups could not be read correctly')
+					}
+				} else {
+					addWarning('groups were not found')
+				}
+			} catch (error) {
+				addWarning('groups could not be read')
+			}
+		}
+	}, [loadData])
 
 	const handleInputChange = (e: ChangeEvent<HTMLInputElement>) => {
 		// Validate input as the user types
@@ -13,16 +35,16 @@ const MaterialGroups: React.FC<MaterialGroupsProps> = ({ onSubmit }) => {
 
 		// Split the input by commas and trim spaces, allowing commas within entries
 		const validDisplayNames = inputValue
-			.split(",")
+			.split(',')
 			.map((name) =>
-				name === " "
+				name === ' '
 					? name
 					: name
-							.replace(/[^a-zA-Z]/g, "")
+							.replace(/[^a-zA-Z]/g, '')
 							.trim()
 							.toLowerCase()
 			)
-			.filter((name) => name !== "")
+			.filter((name) => name !== '')
 
 		setDisplayNames(validDisplayNames)
 		onSubmit(validDisplayNames)
@@ -37,42 +59,39 @@ const MaterialGroups: React.FC<MaterialGroupsProps> = ({ onSubmit }) => {
 		<div
 			className="entry"
 			style={{
-				position: "relative",
-				backgroundColor: "var(--discord-gray-2)",
-				borderRadius: "8px",
-				padding: "10px",
+				position: 'relative',
+				backgroundColor: 'var(--discord-gray-2)',
+				borderRadius: '8px',
+				padding: '10px'
 			}}
 		>
-			<label
-				htmlFor="materialGroupsInput"
-				style={{ display: "block", color: "var(--discord-white)", marginBottom: "5px" }}
-			>
+			<label htmlFor="materialGroupsInput" style={{ display: 'block', color: 'var(--discord-white)', marginBottom: '5px' }}>
 				Material Groups
 			</label>
 			<input
 				type="text"
 				id="materialGroupsInput"
-				value={displayNames.join(", ")}
+				value={displayNames.join(', ')}
 				onChange={handleInputChange}
 				placeholder="e.g., metal, wood, stone"
 				onKeyDown={(e) => {
 					const inputElement = e.target as HTMLInputElement
 					// Remove a single space if the last character is a space when Backspace is pressed
-					if (e.key === "Backspace" && inputElement.value.endsWith(" ")) {
+					if (e.key === 'Backspace' && inputElement.value.endsWith(' ')) {
 						setDisplayNames((prevNames) => prevNames.slice(0, -1))
-					} else if (e.key === "," && inputElement.selectionStart === inputElement.value.length) {
+					} else if (e.key === ',' && inputElement.selectionStart === inputElement.value.length) {
 						// Add an empty entry when comma is pressed at the end
-						setDisplayNames((prevNames) => [...prevNames, ""])
+						setDisplayNames((prevNames) => [...prevNames, ''])
 					}
 				}}
 				style={{
-					backgroundColor: "var(--discord-gray-3)",
-					color: "var(--discord-white)",
-					border: "none",
-					width: "90%",
-					padding: "10px",
-					borderRadius: "8px",
-					outline: "none", // Remove the default focus outline
+					backgroundColor: 'var(--discord-gray-3)',
+					color: 'var(--discord-white)',
+					border: 'none',
+					width: '90%',
+					padding: '10px',
+					borderRadius: '8px',
+					outline: 'none' // Remove the default focus outline
 				}}
 			/>
 		</div>
