@@ -1,8 +1,9 @@
-import React, { useState, useEffect, useRef } from "react"
-import SingleSlider from "./SingleSlider"
-import IntegerSliderEntry from "./IntegerSliderEntry"
-import HighLimitSliderEntry from "./HighLimitSliderEntry"
-import StringStatEntry from "./StringStatInput"
+import React, { useState, useEffect, useRef } from 'react'
+import SingleSlider from './SingleSlider'
+import IntegerSliderEntry from './IntegerSliderEntry'
+import HighLimitSliderEntry from './HighLimitSliderEntry'
+import StringStatEntry from './StringStatInput'
+import { useLoadData } from '../Load/LoadDataProvider'
 
 interface SliderEntryProps {
 	onSubmit: (sliderValues: Record<string, number | string>) => void
@@ -11,7 +12,7 @@ interface SliderEntryProps {
 enum CustomSliderType {
 	INTEGER,
 	FLOAT,
-	STRING,
+	STRING
 }
 
 const SliderEntry: React.FC<SliderEntryProps> = ({ onSubmit }) => {
@@ -21,7 +22,7 @@ const SliderEntry: React.FC<SliderEntryProps> = ({ onSubmit }) => {
 		flexibility: 3,
 		durability: 256,
 		mining_level: 2,
-		mining_speed: 5,
+		mining_speed: 5
 	})
 
 	const [customSliders, setCustomSliders] = useState<{
@@ -36,11 +37,54 @@ const SliderEntry: React.FC<SliderEntryProps> = ({ onSubmit }) => {
 	const [isDropdownOpen, setIsDropdownOpen] = useState(false)
 	const dropdownRef = useRef<HTMLDivElement>(null)
 	const dropdownButtonRef = useRef<HTMLButtonElement>(null)
+	const { loadData, addWarning } = useLoadData()
+
+	useEffect(() => {
+		const excludeKeys: string[] = ['key', 'translation', 'fake_translation']
+		const baseSlider: string[] = ['hardness', 'flexibility', 'density', 'durability', 'mining_level', 'mining_speed']
+		if (loadData != null) {
+			const entries = Object.entries(loadData)
+
+			// Filter out entries with keys in excludeKeys
+			const filteredEntries = entries.filter(([key]) => !excludeKeys.includes(key))
+
+			const baseSliders = filteredEntries.filter(([key]) => baseSlider.includes(key))
+
+			const customEntries = filteredEntries.filter(([key]) => !baseSlider.includes(key))
+
+			baseSliders.forEach(([key, value]) => {
+				if (typeof value === 'number') {
+					handleSliderChange(key, value)
+				}
+			})
+
+			// Process the remaining entries
+			let sliders = {}
+			customEntries.forEach(([key, value]) => {
+				if (typeof value === 'number' || typeof value === 'string') {
+					let uuid
+					do {
+						uuid = generateId()
+					} while (customSliders[uuid] !== undefined)
+					sliders = {
+						...sliders,
+						[uuid]: {
+							id: uuid,
+							name: key,
+							value: value,
+							type: typeof value === 'number' ? CustomSliderType.FLOAT : CustomSliderType.STRING
+						}
+					}
+				}
+				setCustomSliders(sliders)
+			})
+		}
+	}, [loadData])
 
 	const handleSliderChange = (sliderName: string, newValue: number) => {
 		setSliderValues((prevValues) => ({
 			...prevValues,
-			[sliderName]: newValue,
+			[sliderName]: newValue
 		}))
 	}
 
@@ -50,23 +94,19 @@ const SliderEntry: React.FC<SliderEntryProps> = ({ onSubmit }) => {
 
 	useEffect(() => {
 		const handleClickOutside = (event: MouseEvent) => {
-			if (
-				dropdownRef.current &&
-				!dropdownRef.current.contains(event.target as Node) &&
-				!dropdownButtonRef.current?.contains(event.target as Node)
-			) {
+			if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node) && !dropdownButtonRef.current?.contains(event.target as Node)) {
 				setIsDropdownOpen(false)
 			}
 		}
 
 		if (isDropdownOpen) {
-			document.addEventListener("mousedown", handleClickOutside)
+			document.addEventListener('mousedown', handleClickOutside)
 		} else {
-			document.removeEventListener("mousedown", handleClickOutside)
+			document.removeEventListener('mousedown', handleClickOutside)
 		}
 
 		return () => {
-			document.removeEventListener("mousedown", handleClickOutside)
+			document.removeEventListener('mousedown', handleClickOutside)
 		}
 	}, [isDropdownOpen])
 
@@ -91,8 +131,8 @@ const SliderEntry: React.FC<SliderEntryProps> = ({ onSubmit }) => {
 									...prev,
 									[slider.id]: {
 										...slider,
-										value,
-									},
+										value
+									}
 								}))
 							}}
 							value={slider.value}
@@ -102,8 +142,8 @@ const SliderEntry: React.FC<SliderEntryProps> = ({ onSubmit }) => {
 									...prev,
 									[slider.id]: {
 										...slider,
-										name: value,
-									},
+										name: value
+									}
 								}))
 							}}
 						/>
@@ -119,8 +159,8 @@ const SliderEntry: React.FC<SliderEntryProps> = ({ onSubmit }) => {
 									...prev,
 									[slider.id]: {
 										...slider,
-										value,
-									},
+										value
+									}
 								}))
 							}}
 							editableLabel={true}
@@ -129,8 +169,8 @@ const SliderEntry: React.FC<SliderEntryProps> = ({ onSubmit }) => {
 									...prev,
 									[slider.id]: {
 										...slider,
-										name: value,
-									},
+										name: value
+									}
 								}))
 							}}
 						/>
@@ -146,8 +186,8 @@ const SliderEntry: React.FC<SliderEntryProps> = ({ onSubmit }) => {
 									...prev,
 									[slider.id]: {
 										...slider,
-										value,
-									},
+										value
+									}
 								}))
 							}}
 							editableLabel={true}
@@ -156,8 +196,8 @@ const SliderEntry: React.FC<SliderEntryProps> = ({ onSubmit }) => {
 									...prev,
 									[slider.id]: {
 										...slider,
-										name: value,
-									},
+										name: value
+									}
 								}))
 							}}
 						/>
@@ -166,9 +206,9 @@ const SliderEntry: React.FC<SliderEntryProps> = ({ onSubmit }) => {
 			}
 
 			return (
-				<div key={slider.id} style={{ display: "flex", gap: "5px", justifyItems: "center" }}>
+				<div key={slider.id} style={{ display: 'flex', gap: '5px', justifyItems: 'center' }}>
 					<div
-						style={{ cursor: "pointer" }}
+						style={{ cursor: 'pointer' }}
 						onClick={() => {
 							setCustomSliders((prevSliders) => {
 								const newSliders = { ...prevSliders }
@@ -186,52 +226,28 @@ const SliderEntry: React.FC<SliderEntryProps> = ({ onSubmit }) => {
 	}
 
 	function generateId() {
-		return "_" + Math.random().toString(36).substr(2, 9) + Date.now().toString(36)
+		return '_' + Math.random().toString(36).substr(2, 9) + Date.now().toString(36)
 	}
 
 	return (
 		<div
 			className="entry"
 			style={{
-				position: "relative",
-				backgroundColor: "var(--discord-gray-2)",
-				borderRadius: "8px",
-				padding: "10px",
-				color: "var(--discord-white)",
+				position: 'relative',
+				backgroundColor: 'var(--discord-gray-2)',
+				borderRadius: '8px',
+				padding: '10px',
+				color: 'var(--discord-white)'
 			}}
 		>
-			<SingleSlider
-				label="Hardness"
-				value={sliderValues.hardness}
-				onChange={(value) => handleSliderChange("hardness", value)}
-			/>
-			<SingleSlider
-				label="Density"
-				value={sliderValues.density}
-				onChange={(value) => handleSliderChange("density", value)}
-			/>
-			<SingleSlider
-				label="Flexibility"
-				value={sliderValues.flexibility}
-				onChange={(value) => handleSliderChange("flexibility", value)}
-			/>
-			<HighLimitSliderEntry
-				label="Durability"
-				value={sliderValues.durability}
-				onChange={(value) => handleSliderChange("durability", value)}
-			/>
-			<IntegerSliderEntry
-				label="Mining Level"
-				value={sliderValues.mining_level}
-				onChange={(value) => handleSliderChange("mining_level", value)}
-			/>
-			<SingleSlider
-				label="Mining Speed"
-				value={sliderValues.mining_speed}
-				onChange={(value) => handleSliderChange("mining_speed", value)}
-			/>
+			<SingleSlider label="Hardness" value={sliderValues.hardness} onChange={(value) => handleSliderChange('hardness', value)} />
+			<SingleSlider label="Density" value={sliderValues.density} onChange={(value) => handleSliderChange('density', value)} />
+			<SingleSlider label="Flexibility" value={sliderValues.flexibility} onChange={(value) => handleSliderChange('flexibility', value)} />
+			<HighLimitSliderEntry label="Durability" value={sliderValues.durability} onChange={(value) => handleSliderChange('durability', value)} />
+			<IntegerSliderEntry label="Mining Level" value={sliderValues.mining_level} onChange={(value) => handleSliderChange('mining_level', value)} />
+			<SingleSlider label="Mining Speed" value={sliderValues.mining_speed} onChange={(value) => handleSliderChange('mining_speed', value)} />
 			{renderCustomSliders()}
-			<div style={{ position: "relative" }}>
+			<div style={{ position: 'relative' }}>
 				<button
 					ref={dropdownButtonRef}
 					onClick={(e) => {
@@ -239,33 +255,33 @@ const SliderEntry: React.FC<SliderEntryProps> = ({ onSubmit }) => {
 						setIsDropdownOpen(!isDropdownOpen)
 					}}
 					style={{
-						width: "100%",
-						height: "30px",
-						backgroundColor: "var(--discord-gray-3)",
-						color: "#ffffff",
-						border: "none",
-						borderRadius: "5px",
-						cursor: "pointer",
+						width: '100%',
+						height: '30px',
+						backgroundColor: 'var(--discord-gray-3)',
+						color: '#ffffff',
+						border: 'none',
+						borderRadius: '5px',
+						cursor: 'pointer'
 					}}
 				>
-					<span style={{ fontSize: "14pt" }}>+</span>
+					<span style={{ fontSize: '14pt' }}>+</span>
 				</button>
 				{isDropdownOpen && (
 					<div
 						ref={dropdownRef}
 						style={{
-							position: "absolute",
-							top: "35px", // Adjust the position as needed
-							left: "0",
-							backgroundColor: "var(--discord-gray-3)",
+							position: 'absolute',
+							top: '35px', // Adjust the position as needed
+							left: '0',
+							backgroundColor: 'var(--discord-gray-3)',
 							// border: "1px solid #ccc",
-							borderRadius: "5px",
-							boxShadow: "0 2px 5px rgba(0, 0, 0, 0.2)",
+							borderRadius: '5px',
+							boxShadow: '0 2px 5px rgba(0, 0, 0, 0.2)',
 							zIndex: 1,
-							width: "100%", // Make the dropdown the same width as the button
+							width: '100%' // Make the dropdown the same width as the button
 						}}
 					>
-						<ul style={{ listStyle: "none", padding: "10px", margin: 0 }}>
+						<ul style={{ listStyle: 'none', padding: '10px', margin: 0 }}>
 							{Object.keys(CustomSliderType)
 								.filter((key) => isNaN(Number(key)))
 								.map((key) => (
@@ -280,10 +296,10 @@ const SliderEntry: React.FC<SliderEntryProps> = ({ onSubmit }) => {
 												...customSliders,
 												[uuid]: {
 													id: uuid,
-													name: "new",
-													value: key === "STRING" ? "" : 0,
-													type: CustomSliderType[key as keyof typeof CustomSliderType],
-												},
+													name: 'new',
+													value: key === 'STRING' ? '' : 0,
+													type: CustomSliderType[key as keyof typeof CustomSliderType]
+												}
 											})
 											setIsDropdownOpen(false)
 										}}

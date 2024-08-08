@@ -1,6 +1,7 @@
-import React, { useState } from "react"
-import CustomComponent from "./DisplayComponent"
-import "../.././App.css"
+import React, { useEffect, useState } from 'react'
+import CustomComponent from './DisplayComponent'
+import '../.././App.css'
+import { useLoadData } from '../Load/LoadDataProvider'
 
 interface StatBox {
 	sliderValues: any
@@ -41,212 +42,152 @@ const StatBoxComponent: React.FC<StatBox> = ({ sliderValues, colorPalette, trans
 		return numerator / denominator
 	}
 
-	const result =
-		Math.floor(customPower((sliderValues.hardness - 3.4) * 2.3, 1 / 3)) +
-		7 -
-		Math.floor(sliderValues.density / 4) * 2
+	const result = Math.floor(customPower((sliderValues.hardness - 3.4) * 2.3, 1 / 3)) + 7 - Math.floor(sliderValues.density / 4) * 2
 
 	return (
 		<div id="display">
-			<div style={{ display: "flex", gap: "20px" }}>
+			<div style={{ display: 'flex', gap: '20px' }}>
 				<div id="display-list" style={{ flex: 1 }}>
 					<CustomComponent
 						imageProps={{
-							imageUrl: process.env.PUBLIC_URL + "/images/sword.png",
-							colorPalette: colorPalette,
+							imageUrl: process.env.PUBLIC_URL + '/images/sword.png',
+							colorPalette: colorPalette
 						}}
-						headerText={translation + "Sword"}
-						lines={[
-							{ text: "Attack Damage : " + (sliderValues.hardness + 1).toFixed(2) },
-							{ text: "Attack Speed  : 1.6" },
-						]}
+						headerText={translation + 'Sword'}
+						lines={[{ text: 'Attack Damage : ' + (sliderValues.hardness + 1).toFixed(2) }, { text: 'Attack Speed  : 1.6' }]}
 					/>
 					<CustomComponent
 						imageProps={{
-							imageUrl: process.env.PUBLIC_URL + "/images/axe.png",
-							colorPalette: colorPalette,
+							imageUrl: process.env.PUBLIC_URL + '/images/axe.png',
+							colorPalette: colorPalette
 						}}
-						headerText={translation + "Axe"}
+						headerText={translation + 'Axe'}
 						lines={[
 							{
 								text:
-									"Attack Damage : " +
-									(
-										Math.floor(customPower((sliderValues.hardness - 3.4) * 2.3, 1 / 3)) +
-										7 -
-										Math.floor(sliderValues.density / 4) * 2
-									).toFixed(2),
+									'Attack Damage : ' +
+									(Math.floor(customPower((sliderValues.hardness - 3.4) * 2.3, 1 / 3)) + 7 - Math.floor(sliderValues.density / 4) * 2).toFixed(2)
 							},
 							{
-								text:
-									"Attack Speed  : " +
-									(
-										Math.ceil(customPower(sliderValues.mining_speed - 6, 0.2) - 0.5 + 10) / 10 -
-										0.1
-									).toFixed(2),
+								text: 'Attack Speed  : ' + (Math.ceil(customPower(sliderValues.mining_speed - 6, 0.2) - 0.5 + 10) / 10 - 0.1).toFixed(2)
 							},
-							{ text: "Mining Speed  : " + sliderValues.mining_speed },
+							{ text: 'Mining Speed  : ' + sliderValues.mining_speed }
 						]}
 					/>
 				</div>
 				<div id="display-list" style={{ flex: 2 }}>
 					<CustomComponent
 						imageProps={{
-							imageUrl: process.env.PUBLIC_URL + "/images/helmet.png",
-							colorPalette: colorPalette,
+							imageUrl: process.env.PUBLIC_URL + '/images/helmet.png',
+							colorPalette: colorPalette
 						}}
-						headerText={translation + "Helmet"}
+						headerText={translation + 'Helmet'}
 						lines={[
 							{
-								text: "Armor                : " + Math.floor(sliderValues.hardness / 2).toFixed(2),
+								text: 'Armor                : ' + Math.floor(sliderValues.hardness / 2).toFixed(2)
 							},
 							{
 								text:
-									"Armor Tougness         : " +
+									'Armor Tougness         : ' +
 									(sliderValues.mining_level === 2
 										? 0
-										: ((sliderValues.mining_level - 2) /
-												Math.abs(sliderValues.mining_level - 2) /
-												2 +
-												0.5) *
-										  (sliderValues.mining_level - 1)
-									).toFixed(2),
+										: ((sliderValues.mining_level - 2) / Math.abs(sliderValues.mining_level - 2) / 2 + 0.5) * (sliderValues.mining_level - 1)
+									).toFixed(2)
 							},
 							{
 								text:
-									"Knockback Ressistance  : " +
+									'Knockback Ressistance  : ' +
 									(sliderValues.mining_level === 3
 										? 0
-										: ((sliderValues.mining_level - 3) /
-												Math.abs(sliderValues.mining_level - 3) /
-												2 +
-												0.5) *
-										  (sliderValues.mining_level - 3)
-									).toFixed(2),
-							},
+										: ((sliderValues.mining_level - 3) / Math.abs(sliderValues.mining_level - 3) / 2 + 0.5) * (sliderValues.mining_level - 3)
+									).toFixed(2)
+							}
 						]}
 					/>
 					<CustomComponent
 						imageProps={{
-							imageUrl: process.env.PUBLIC_URL + "/images/chestplate.png",
-							colorPalette: colorPalette,
+							imageUrl: process.env.PUBLIC_URL + '/images/chestplate.png',
+							colorPalette: colorPalette
 						}}
-						headerText={translation + "Chestplate"}
+						headerText={translation + 'Chestplate'}
 						lines={[
 							{
-								text:
-									"Armor                : " +
-									(sliderValues.hardness + 2 - Math.ceil(sliderValues.flexibility / 4)).toFixed(2),
+								text: 'Armor                : ' + (sliderValues.hardness + 2 - Math.ceil(sliderValues.flexibility / 4)).toFixed(2)
 							},
 							{
 								text:
-									"Armor Tougness         : " +
+									'Armor Tougness         : ' +
 									(sliderValues.mining_level === 2
 										? 0
-										: ((sliderValues.mining_level - 2) /
-												Math.abs(sliderValues.mining_level - 2) /
-												2 +
-												0.5) *
-										  (sliderValues.mining_level - 1)
-									).toFixed(2),
+										: ((sliderValues.mining_level - 2) / Math.abs(sliderValues.mining_level - 2) / 2 + 0.5) * (sliderValues.mining_level - 1)
+									).toFixed(2)
 							},
 							{
 								text:
-									"Knockback Ressistance  : " +
+									'Knockback Ressistance  : ' +
 									(sliderValues.mining_level === 3
 										? 0
-										: ((sliderValues.mining_level - 3) /
-												Math.abs(sliderValues.mining_level - 3) /
-												2 +
-												0.5) *
-										  (sliderValues.mining_level - 3)
-									).toFixed(2),
-							},
+										: ((sliderValues.mining_level - 3) / Math.abs(sliderValues.mining_level - 3) / 2 + 0.5) * (sliderValues.mining_level - 3)
+									).toFixed(2)
+							}
 						]}
 					/>
 					<CustomComponent
 						imageProps={{
-							imageUrl: process.env.PUBLIC_URL + "/images/leggings.png",
-							colorPalette: colorPalette,
+							imageUrl: process.env.PUBLIC_URL + '/images/leggings.png',
+							colorPalette: colorPalette
 						}}
-						headerText={translation + "Leggings"}
+						headerText={translation + 'Leggings'}
 						lines={[
 							{
 								text:
-									"Armor                : " +
-									(
-										((sliderValues.hardness -
-											Math.ceil(sliderValues.hardness / 6.5) +
-											Math.ceil(sliderValues.hardness / 4.5) -
-											1) /
-											7) *
-										7
-									).toFixed(2),
+									'Armor                : ' +
+									(((sliderValues.hardness - Math.ceil(sliderValues.hardness / 6.5) + Math.ceil(sliderValues.hardness / 4.5) - 1) / 7) * 7).toFixed(2)
 							},
 							{
 								text:
-									"Armor Tougness         : " +
+									'Armor Tougness         : ' +
 									(sliderValues.mining_level === 2
 										? 0
-										: ((sliderValues.mining_level - 2) /
-												Math.abs(sliderValues.mining_level - 2) /
-												2 +
-												0.5) *
-										  (sliderValues.mining_level - 1)
-									).toFixed(2),
+										: ((sliderValues.mining_level - 2) / Math.abs(sliderValues.mining_level - 2) / 2 + 0.5) * (sliderValues.mining_level - 1)
+									).toFixed(2)
 							},
 							{
 								text:
-									"Knockback Ressistance  : " +
+									'Knockback Ressistance  : ' +
 									(sliderValues.mining_level === 3
 										? 0
-										: ((sliderValues.mining_level - 3) /
-												Math.abs(sliderValues.mining_level - 3) /
-												2 +
-												0.5) *
-										  (sliderValues.mining_level - 3)
-									).toFixed(2),
-							},
+										: ((sliderValues.mining_level - 3) / Math.abs(sliderValues.mining_level - 3) / 2 + 0.5) * (sliderValues.mining_level - 3)
+									).toFixed(2)
+							}
 						]}
 					/>
 					<CustomComponent
 						imageProps={{
-							imageUrl: process.env.PUBLIC_URL + "/images/boots.png",
-							colorPalette: colorPalette,
+							imageUrl: process.env.PUBLIC_URL + '/images/boots.png',
+							colorPalette: colorPalette
 						}}
-						headerText={translation + "Boots"}
+						headerText={translation + 'Boots'}
 						lines={[
 							{
-								text:
-									"Armor                : " +
-									Math.floor(
-										sliderValues.hardness / 2 - Math.floor(sliderValues.density / 4)
-									).toFixed(2),
+								text: 'Armor                : ' + Math.floor(sliderValues.hardness / 2 - Math.floor(sliderValues.density / 4)).toFixed(2)
 							},
 							{
 								text:
-									"Armor Tougness         : " +
+									'Armor Tougness         : ' +
 									(sliderValues.mining_level === 2
 										? 0
-										: ((sliderValues.mining_level - 2) /
-												Math.abs(sliderValues.mining_level - 2) /
-												2 +
-												0.5) *
-										  (sliderValues.mining_level - 1)
-									).toFixed(2),
+										: ((sliderValues.mining_level - 2) / Math.abs(sliderValues.mining_level - 2) / 2 + 0.5) * (sliderValues.mining_level - 1)
+									).toFixed(2)
 							},
 							{
 								text:
-									"Knockback Ressistance  : " +
+									'Knockback Ressistance  : ' +
 									(sliderValues.mining_level === 3
 										? 0
-										: ((sliderValues.mining_level - 3) /
-												Math.abs(sliderValues.mining_level - 3) /
-												2 +
-												0.5) *
-										  (sliderValues.mining_level - 3)
-									).toFixed(2),
-							},
+										: ((sliderValues.mining_level - 3) / Math.abs(sliderValues.mining_level - 3) / 2 + 0.5) * (sliderValues.mining_level - 3)
+									).toFixed(2)
+							}
 						]}
 					/>
 				</div>
