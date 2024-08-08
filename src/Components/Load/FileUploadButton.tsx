@@ -8,8 +8,20 @@ interface UploadButtonProps {
 
 const FileUpload: React.FC<UploadButtonProps> = ({ onWarning }) => {
 	const { setLoadData, addWarning } = useLoadData()
+	const [filename, setFileName] = useState<string>('')
 
 	const { registerWarningListener, clearWarningListeners } = useLoadData()
+
+	const buttonStyle = {
+		padding: '10px',
+		margin: '5px',
+		backgroundColor: '#7289DA', // Discord's primary blue color
+		color: '#ffffff', // Discord's white color
+		border: 'none',
+		borderRadius: '5px',
+		cursor: 'pointer',
+		display: 'inline-block'
+	}
 
 	useEffect(() => {
 		// Register the warning listener
@@ -34,6 +46,7 @@ const FileUpload: React.FC<UploadButtonProps> = ({ onWarning }) => {
 			try {
 				const parsed = JSON.parse(text)
 				setLoadData(parsed)
+				setFileName(selectedFile.name)
 			} catch (error) {
 				addWarning('could not load as a material! ' + selectedFile?.name)
 				console.log(error)
@@ -47,8 +60,15 @@ const FileUpload: React.FC<UploadButtonProps> = ({ onWarning }) => {
 
 	return (
 		<form onSubmit={handleSubmit}>
-			<input type="file" onChange={handleFileChange} />
-			<button type="submit">Upload</button>
+			<label style={buttonStyle}>
+				Load From File
+				<input
+					type="file"
+					onChange={handleFileChange}
+					style={{ display: 'none' }} // Hide the default file input
+				/>
+			</label>
+			{filename}
 		</form>
 	)
 }
