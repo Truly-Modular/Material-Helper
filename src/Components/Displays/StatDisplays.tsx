@@ -17,6 +17,8 @@ const StatBoxComponent: React.FC<StatBox> = ({ sliderValues, colorPalette, trans
 	}
 
 	function customPower(x: number, exp: number): number {
+		console.log(JSON.stringify(sliderValues))
+		console.log('logging')
 		// Handle negative values separately
 		if (x < 0) {
 			// Check if the exponent is a rational number with an odd numerator
@@ -31,18 +33,6 @@ const StatBoxComponent: React.FC<StatBox> = ({ sliderValues, colorPalette, trans
 			return Math.pow(x, exp)
 		}
 	}
-
-	function customDivide(numerator: number, denominator: number): number {
-		// Check if the denominator is zero
-		if (denominator === 0) {
-			return 0
-		}
-
-		// Perform the division
-		return numerator / denominator
-	}
-
-	const result = Math.floor(customPower((sliderValues.hardness - 3.4) * 2.3, 1 / 3)) + 7 - Math.floor(sliderValues.density / 4) * 2
 
 	return (
 		<div id="display">
@@ -66,7 +56,11 @@ const StatBoxComponent: React.FC<StatBox> = ({ sliderValues, colorPalette, trans
 							{
 								text:
 									'Attack Damage : ' +
-									(Math.floor(customPower((sliderValues.hardness - 3.4) * 2.3, 1 / 3)) + 7 - Math.floor(sliderValues.density / 4) * 2).toFixed(2)
+									(
+										Math.floor(customPower((sliderValues.hardness - 3.4) * 2.3, 1 / 3)) +
+										7 +
+										(sliderValues.axe_damage === undefined ? 0 : sliderValues.axe_damage)
+									).toFixed(2)
 							},
 							{
 								text: 'Attack Speed  : ' + (Math.ceil(customPower(sliderValues.mining_speed - 6, 0.2) - 0.5 + 10) / 10 - 0.1).toFixed(2)

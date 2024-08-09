@@ -37,7 +37,7 @@ const SliderEntry: React.FC<SliderEntryProps> = ({ onSubmit }) => {
 	const [isDropdownOpen, setIsDropdownOpen] = useState(false)
 	const dropdownRef = useRef<HTMLDivElement>(null)
 	const dropdownButtonRef = useRef<HTMLButtonElement>(null)
-	const { loadData, addWarning } = useLoadData()
+	const { loadData } = useLoadData()
 
 	useEffect(() => {
 		const excludeKeys: string[] = ['key', 'translation', 'fake_translation']
