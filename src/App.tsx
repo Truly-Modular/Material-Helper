@@ -124,12 +124,13 @@ const App: React.FC<AppProps> = () => {
 			warnUnfinishedData()
 			return
 		}
+		const modID = materialId.split(':')[0]
 		const displayID = materialId.split(':')[1]
 		const zip = new JSZip()
 
 		// Add folders
 		const dataFolder = zip.folder('data')
-		const websiteFolder = is121Plus ? dataFolder?.folder('website') : undefined
+		const websiteFolder = is121Plus ? dataFolder?.folder('website') : dataFolder?.folder(modID)
 		const miapiFolder = is121Plus ? websiteFolder?.folder('miapi') : dataFolder?.folder('miapi')
 		const materialFolder = miapiFolder?.folder('materials')
 		const mcMeta = {
@@ -140,7 +141,11 @@ const App: React.FC<AppProps> = () => {
 		}
 
 		// Add files
-		materialFolder?.file('generated_' + displayID + '.json', JSON.stringify(generateMaterialObject())) // Add your file content here
+		if (is121Plus) {
+			materialFolder?.file(displayID + '.json', JSON.stringify(generateMaterialObject())) // Add your file content here
+		} else {
+			materialFolder?.file(displayID + '.json', JSON.stringify(generateMaterialObject())) // Add your file content here
+		}
 		zip?.file('pack.mcmeta', JSON.stringify(mcMeta))
 
 		// Generate ZIP file
