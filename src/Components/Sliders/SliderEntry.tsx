@@ -40,8 +40,11 @@ const SliderEntry: React.FC<SliderEntryProps> = ({ onSubmit }) => {
 	const { loadData } = useLoadData()
 
 	useEffect(() => {
+		const is121Plus = false
 		const excludeKeys: string[] = ['key', 'translation', 'fake_translation']
-		const baseSlider: string[] = ['hardness', 'flexibility', 'density', 'durability', 'mining_level', 'mining_speed']
+		const baseSlider: string[] = is121Plus
+			? ['hardness', 'flexibility', 'density', 'durability', 'mining_level', 'mining_speed']
+			: ['hardness', 'flexibility', 'density', 'durability', 'tier', 'mining_speed']
 		if (loadData != null) {
 			const entries = Object.entries(loadData)
 

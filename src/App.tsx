@@ -9,7 +9,7 @@ import Warning from './Components/SelfDeletingWarning'
 import JSZip from 'jszip'
 import './App.css'
 import ToggleButton from './Components/Buttons/ToggleButton'
-import LoadDataProvider, { useLoadData } from './Components/Load/LoadDataProvider'
+import LoadDataProvider from './Components/Load/LoadDataProvider'
 import FileUpload from './Components/Load/FileUploadButton'
 
 interface AppProps {}
