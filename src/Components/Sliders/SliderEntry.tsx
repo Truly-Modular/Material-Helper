@@ -6,7 +6,18 @@ import StringStatEntry from './StringStatInput'
 import { useLoadData } from '../Load/LoadDataProvider'
 
 interface SliderEntryProps {
-	onSubmit: (sliderValues: Record<string, number | string>) => void
+	onSubmit: (values: Record<string, number | string>) => void
+	is121Plus: boolean
+	setIs121Plus: (value: boolean) => void
+}
+
+interface SliderValues {
+	hardness: number
+	density: number
+	flexibility: number
+	durability: number
+	mining_speed: number
+	mining_level: number | string
 }
 
 enum CustomSliderType {
@@ -15,8 +26,8 @@ enum CustomSliderType {
 	STRING
 }
 
-const SliderEntry: React.FC<SliderEntryProps> = ({ onSubmit }) => {
-	const [sliderValues, setSliderValues] = useState({
+const SliderEntry: React.FC<SliderEntryProps> = ({ onSubmit, is121Plus }) => {
+	const [sliderValues, setSliderValues] = useState<SliderValues>({
 		hardness: 6,
 		density: 2,
 		flexibility: 3,
@@ -40,19 +51,15 @@ const SliderEntry: React.FC<SliderEntryProps> = ({ onSubmit }) => {
 	const { loadData } = useLoadData()
 
 	useEffect(() => {
-		const is121Plus = false
 		const excludeKeys: string[] = ['key', 'translation', 'fake_translation']
 		const baseSlider: string[] = is121Plus
-			? ['hardness', 'flexibility', 'density', 'durability', 'mining_level', 'mining_speed']
-			: ['hardness', 'flexibility', 'density', 'durability', 'tier', 'mining_speed']
+			? ['hardness', 'flexibility', 'density', 'durability', 'mining_speed']
+			: ['hardness', 'flexibility', 'density', 'durability', 'tier', 'mining_speed', 'mining_level']
+
 		if (loadData != null) {
 			const entries = Object.entries(loadData)
-
-			// Filter out entries with keys in excludeKeys
 			const filteredEntries = entries.filter(([key]) => !excludeKeys.includes(key))
-
 			const baseSliders = filteredEntries.filter(([key]) => baseSlider.includes(key))
-
 			const customEntries = filteredEntries.filter(([key]) => !baseSlider.includes(key))
 
 			baseSliders.forEach(([key, value]) => {
@@ -61,30 +68,45 @@ const SliderEntry: React.FC<SliderEntryProps> = ({ onSubmit }) => {
 				}
 			})
 
-			// Process the remaining entries
-			let sliders = {}
+			let sliders = { ...customSliders }
+
+			if (is121Plus) {
+				// Add string-based mining_level
+				let uuid
+				do {
+					uuid = generateId()
+				} while (sliders[uuid] !== undefined)
+				sliders[uuid] = {
+					id: uuid,
+					name: 'mining_level',
+					value: 'minecraft:incorrect_for_wooden_tools',
+					type: CustomSliderType.STRING
+				}
+			} else {
+				// Remove string-based mining_level if switching back
+				sliders = Object.fromEntries(Object.entries(sliders).filter(([_, slider]) => slider.name !== 'mining_level'))
+			}
+
 			customEntries.forEach(([key, value]) => {
 				if (typeof value === 'number' || typeof value === 'string') {
 					let uuid
 					do {
 						uuid = generateId()
-					} while (customSliders[uuid] !== undefined)
-					sliders = {
-						...sliders,
-						[uuid]: {
-							id: uuid,
-							name: key,
-							value: value,
-							type: typeof value === 'number' ? CustomSliderType.FLOAT : CustomSliderType.STRING
-						}
+					} while (sliders[uuid] !== undefined)
+					sliders[uuid] = {
+						id: uuid,
+						name: key,
+						value: value,
+						type: typeof value === 'number' ? CustomSliderType.FLOAT : CustomSliderType.STRING
 					}
 				}
-				setCustomSliders(sliders)
 			})
-		}
-	}, [loadData])
 
-	const handleSliderChange = (sliderName: string, newValue: number) => {
+			setCustomSliders(sliders)
+		}
+	}, [loadData, is121Plus]) // <-- add is121Plus to deps
+
+	const handleSliderChange = (sliderName: string, newValue: number | string) => {
 		setSliderValues((prevValues) => ({
 			...prevValues,
 			[sliderName]: newValue
@@ -94,6 +116,14 @@ const SliderEntry: React.FC<SliderEntryProps> = ({ onSubmit }) => {
 	useEffect(() => {
 		handleEntrySubmit()
 	}, [sliderValues, customSliders])
+
+	useEffect(() => {
+		if (is121Plus) {
+			handleSliderChange('mining_level', 'minecraft:incorrect_for_wooden_tools')
+		} else {
+			handleSliderChange('mining_level', 2)
+		}
+	}, [is121Plus])
 
 	useEffect(() => {
 		const handleClickOutside = (event: MouseEvent) => {
@@ -247,8 +277,22 @@ const SliderEntry: React.FC<SliderEntryProps> = ({ onSubmit }) => {
 			<SingleSlider label="Density" value={sliderValues.density} onChange={(value) => handleSliderChange('density', value)} />
 			<SingleSlider label="Flexibility" value={sliderValues.flexibility} onChange={(value) => handleSliderChange('flexibility', value)} />
 			<HighLimitSliderEntry label="Durability" value={sliderValues.durability} onChange={(value) => handleSliderChange('durability', value)} />
-			<IntegerSliderEntry label="Mining Level" value={sliderValues.mining_level} onChange={(value) => handleSliderChange('mining_level', value)} />
 			<SingleSlider label="Mining Speed" value={sliderValues.mining_speed} onChange={(value) => handleSliderChange('mining_speed', value)} />
+			{is121Plus ? (
+				<StringStatEntry
+					label="Mining Level"
+					value={String(sliderValues.mining_level)}
+					onChange={(value) => handleSliderChange('mining_level', value)}
+					editableLabel={false}
+				/>
+			) : (
+				<IntegerSliderEntry
+					label="Mining Level"
+					value={typeof sliderValues.mining_level === 'number' ? sliderValues.mining_level : 2}
+					onChange={(value) => handleSliderChange('mining_level', value)}
+				/>
+			)}
+
 			{renderCustomSliders()}
 			<div style={{ position: 'relative' }}>
 				<button

@@ -41,7 +41,7 @@ const App: React.FC<AppProps> = () => {
 		const cleanId = materialId.replace(':', '_')
 		const json: any = {
 			key: `website-${cleanId}`,
-			translation: `miapi.material.website-${cleanId}`,
+			translation: is121Plus ? materialDisplayName : `miapi.material.website-${cleanId}`,
 			icon: {
 				type: 'item',
 				item: materialId
@@ -130,7 +130,7 @@ const App: React.FC<AppProps> = () => {
 
 		// Add folders
 		const dataFolder = zip.folder('data')
-		const websiteFolder = is121Plus ? dataFolder?.folder('website') : dataFolder?.folder(modID)
+		const websiteFolder = dataFolder?.folder('web_helper_' + modID)
 		const miapiFolder = is121Plus ? websiteFolder?.folder('miapi') : dataFolder?.folder('miapi')
 		const materialFolder = miapiFolder?.folder('materials')
 		const mcMeta = {
@@ -186,7 +186,7 @@ const App: React.FC<AppProps> = () => {
 			warnUnfinishedData()
 			return
 		}
-		const jsonData = JSON.stringify(generateMaterialObject())
+		const jsonData = JSON.stringify(generateMaterialObject(), null, 4)
 
 		// Copy JSON data to the clipboard
 		navigator.clipboard.writeText(jsonData).then(() => {
@@ -326,7 +326,7 @@ const App: React.FC<AppProps> = () => {
 						<div style={{ display: 'flex', gap: '20px' }}>
 							<div>
 								<h1>Stats</h1>
-								<SliderEntry onSubmit={handleSliderSubmit} />
+								<SliderEntry onSubmit={handleSliderSubmit} is121Plus={is121Plus} setIs121Plus={setIs121Plus} />
 							</div>
 							<div>
 								<h1>Previews</h1>
