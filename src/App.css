@@ -9,7 +9,7 @@
 }
 
 body {
-	background-color: "--discord-gray-1"; /* Replace #ffffff with the color code or name of your desired background color */
+	background-color: '--discord-gray-1'; /* Replace #ffffff with the color code or name of your desired background color */
 }
 
 h1 {

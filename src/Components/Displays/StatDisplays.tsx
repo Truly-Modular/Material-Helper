@@ -7,9 +7,10 @@ interface StatBox {
 	sliderValues: any
 	colorPalette: string[]
 	translation: string
+	is121: boolean
 }
 
-const StatBoxComponent: React.FC<StatBox> = ({ sliderValues, colorPalette, translation }) => {
+const StatBoxComponent: React.FC<StatBox> = ({ sliderValues, colorPalette, translation, is121 }) => {
 	const [localSliderValues, setLocalSliderValues] = useState<any>(sliderValues)
 
 	const handleSliderChange = (sliderName: any, newValue: number) => {
@@ -56,10 +57,11 @@ const StatBoxComponent: React.FC<StatBox> = ({ sliderValues, colorPalette, trans
 							{
 								text:
 									'Attack Damage : ' +
-									(
-										Math.floor(customPower((sliderValues.hardness - 3.4) * 2.3, 1 / 3)) +
-										7 +
-										(sliderValues.axe_damage === undefined ? 0 : sliderValues.axe_damage)
+									(is121
+										? sliderValues.hardness + sliderValues.density + 1
+										: Math.floor(customPower((sliderValues.hardness - 3.4) * 2.3, 1 / 3)) +
+											7 +
+											(sliderValues.axe_damage === undefined ? 0 : sliderValues.axe_damage)
 									).toFixed(2)
 							},
 							{
@@ -83,17 +85,21 @@ const StatBoxComponent: React.FC<StatBox> = ({ sliderValues, colorPalette, trans
 							{
 								text:
 									'Armor Tougness         : ' +
-									(sliderValues.mining_level === 2
-										? 0
-										: ((sliderValues.mining_level - 2) / Math.abs(sliderValues.mining_level - 2) / 2 + 0.5) * (sliderValues.mining_level - 1)
+									(is121
+										? (sliderValues.armor_toughness ?? sliderValues.toughness ?? 0)
+										: sliderValues.mining_level === 2
+											? 0
+											: ((sliderValues.mining_level - 2) / Math.abs(sliderValues.mining_level - 2) / 2 + 0.5) * (sliderValues.mining_level - 1)
 									).toFixed(2)
 							},
 							{
 								text:
 									'Knockback Ressistance  : ' +
-									(sliderValues.mining_level === 3
-										? 0
-										: ((sliderValues.mining_level - 3) / Math.abs(sliderValues.mining_level - 3) / 2 + 0.5) * (sliderValues.mining_level - 3)
+									(is121
+										? (sliderValues.knockback_ressistance ?? Math.max(0, (sliderValues.toughness ?? 0) - 2))
+										: sliderValues.mining_level === 3
+											? 0
+											: ((sliderValues.mining_level - 3) / Math.abs(sliderValues.mining_level - 3) / 2 + 0.5) * (sliderValues.mining_level - 3)
 									).toFixed(2)
 							}
 						]}
@@ -111,17 +117,21 @@ const StatBoxComponent: React.FC<StatBox> = ({ sliderValues, colorPalette, trans
 							{
 								text:
 									'Armor Tougness         : ' +
-									(sliderValues.mining_level === 2
-										? 0
-										: ((sliderValues.mining_level - 2) / Math.abs(sliderValues.mining_level - 2) / 2 + 0.5) * (sliderValues.mining_level - 1)
+									(is121
+										? (sliderValues.armor_toughness ?? sliderValues.toughness ?? 0)
+										: sliderValues.mining_level === 2
+											? 0
+											: ((sliderValues.mining_level - 2) / Math.abs(sliderValues.mining_level - 2) / 2 + 0.5) * (sliderValues.mining_level - 1)
 									).toFixed(2)
 							},
 							{
 								text:
 									'Knockback Ressistance  : ' +
-									(sliderValues.mining_level === 3
-										? 0
-										: ((sliderValues.mining_level - 3) / Math.abs(sliderValues.mining_level - 3) / 2 + 0.5) * (sliderValues.mining_level - 3)
+									(is121
+										? (sliderValues.knockback_ressistance ?? Math.max(0, (sliderValues.toughness ?? 0) - 2))
+										: sliderValues.mining_level === 3
+											? 0
+											: ((sliderValues.mining_level - 3) / Math.abs(sliderValues.mining_level - 3) / 2 + 0.5) * (sliderValues.mining_level - 3)
 									).toFixed(2)
 							}
 						]}
@@ -141,17 +151,21 @@ const StatBoxComponent: React.FC<StatBox> = ({ sliderValues, colorPalette, trans
 							{
 								text:
 									'Armor Tougness         : ' +
-									(sliderValues.mining_level === 2
-										? 0
-										: ((sliderValues.mining_level - 2) / Math.abs(sliderValues.mining_level - 2) / 2 + 0.5) * (sliderValues.mining_level - 1)
+									(is121
+										? (sliderValues.armor_toughness ?? sliderValues.toughness ?? 0)
+										: sliderValues.mining_level === 2
+											? 0
+											: ((sliderValues.mining_level - 2) / Math.abs(sliderValues.mining_level - 2) / 2 + 0.5) * (sliderValues.mining_level - 1)
 									).toFixed(2)
 							},
 							{
 								text:
 									'Knockback Ressistance  : ' +
-									(sliderValues.mining_level === 3
-										? 0
-										: ((sliderValues.mining_level - 3) / Math.abs(sliderValues.mining_level - 3) / 2 + 0.5) * (sliderValues.mining_level - 3)
+									(is121
+										? (sliderValues.knockback_ressistance ?? Math.max(0, (sliderValues.toughness ?? 0) - 2))
+										: sliderValues.mining_level === 3
+											? 0
+											: ((sliderValues.mining_level - 3) / Math.abs(sliderValues.mining_level - 3) / 2 + 0.5) * (sliderValues.mining_level - 3)
 									).toFixed(2)
 							}
 						]}
@@ -169,17 +183,21 @@ const StatBoxComponent: React.FC<StatBox> = ({ sliderValues, colorPalette, trans
 							{
 								text:
 									'Armor Tougness         : ' +
-									(sliderValues.mining_level === 2
-										? 0
-										: ((sliderValues.mining_level - 2) / Math.abs(sliderValues.mining_level - 2) / 2 + 0.5) * (sliderValues.mining_level - 1)
+									(is121
+										? (sliderValues.armor_toughness ?? sliderValues.toughness ?? 0)
+										: sliderValues.mining_level === 2
+											? 0
+											: ((sliderValues.mining_level - 2) / Math.abs(sliderValues.mining_level - 2) / 2 + 0.5) * (sliderValues.mining_level - 1)
 									).toFixed(2)
 							},
 							{
 								text:
 									'Knockback Ressistance  : ' +
-									(sliderValues.mining_level === 3
-										? 0
-										: ((sliderValues.mining_level - 3) / Math.abs(sliderValues.mining_level - 3) / 2 + 0.5) * (sliderValues.mining_level - 3)
+									(is121
+										? (sliderValues.knockback_ressistance ?? Math.max(0, (sliderValues.toughness ?? 0) - 2))
+										: sliderValues.mining_level === 3
+											? 0
+											: ((sliderValues.mining_level - 3) / Math.abs(sliderValues.mining_level - 3) / 2 + 0.5) * (sliderValues.mining_level - 3)
 									).toFixed(2)
 							}
 						]}

@@ -40,7 +40,6 @@ const App: React.FC<AppProps> = () => {
 	const generateMaterialObject = (): object => {
 		const cleanId = materialId.replace(':', '_')
 		const json: any = {
-			key: `website-${cleanId}`,
 			translation: is121Plus ? materialDisplayName : `miapi.material.website-${cleanId}`,
 			icon: {
 				type: 'item',
@@ -52,22 +51,25 @@ const App: React.FC<AppProps> = () => {
 				? {
 						type: 'image_generated_item',
 						item: `${materialId}`
-				  }
+					}
 				: {
 						type: 'grayscale_map',
-						colors: colorPalette.reduce((acc, color, index, array) => {
-							const step = Math.round(255 / (array.length - 1))
-							acc[Math.round(step * index)] = color.substr(1) // Remove # from color
+						colors: colorPalette.reduce(
+							(acc, color, index, array) => {
+								const step = Math.round(255 / (array.length - 1))
+								acc[Math.round(step * index)] = color.substr(1) // Remove # from color
 
-							// Ensure the last entry is always at 255
-							if (index === array.length - 1) {
-								acc[255] = color.substr(1)
-							}
+								// Ensure the last entry is always at 255
+								if (index === array.length - 1) {
+									acc[255] = color.substr(1)
+								}
 
-							return acc
-						}, {} as Record<string, string>),
+								return acc
+							},
+							{} as Record<string, string>
+						),
 						filler: 'interpolate'
-				  },
+					},
 			items: [
 				{
 					item: materialId,
@@ -81,6 +83,9 @@ const App: React.FC<AppProps> = () => {
 			json[key] = value
 		})
 
+		if (!is121Plus) {
+			json.key = `website-${cleanId}`
+		}
 		return json
 	}
 
@@ -335,7 +340,7 @@ const App: React.FC<AppProps> = () => {
 										Previews aren't representing ingame colors anymore, since automatic generation is toggled!
 									</div>
 								)}
-								<StatBoxComponent sliderValues={sliderValues} colorPalette={colorPalette} translation={materialDisplayName} />
+								<StatBoxComponent sliderValues={sliderValues} colorPalette={colorPalette} translation={materialDisplayName} is121={is121Plus} />
 							</div>
 						</div>
 					</div>

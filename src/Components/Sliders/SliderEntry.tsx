@@ -114,12 +114,41 @@ const SliderEntry: React.FC<SliderEntryProps> = ({ onSubmit, is121Plus }) => {
 	}
 
 	useEffect(() => {
+		setCustomSliders((prev) => {
+			let sliders = { ...prev }
+
+			const existing = Object.values(sliders).find((s) => s.name === 'toughness')
+
+			if (is121Plus) {
+				if (!existing) {
+					let uuid
+					do {
+						uuid = generateId()
+					} while (sliders[uuid] !== undefined)
+
+					sliders[uuid] = {
+						id: uuid,
+						name: 'toughness',
+						value: 0,
+						type: CustomSliderType.FLOAT
+					}
+				}
+			} else {
+				// remove it if switching back
+				sliders = Object.fromEntries(Object.entries(sliders).filter(([_, s]) => s.name !== 'toughness'))
+			}
+
+			return sliders
+		})
+	}, [is121Plus])
+
+	useEffect(() => {
 		handleEntrySubmit()
 	}, [sliderValues, customSliders])
 
 	useEffect(() => {
 		if (is121Plus) {
-			handleSliderChange('mining_level', 'minecraft:incorrect_for_wooden_tools')
+			handleSliderChange('mining_level', 'minecraft:incorrect_for_wooden_tool')
 		} else {
 			handleSliderChange('mining_level', 2)
 		}
