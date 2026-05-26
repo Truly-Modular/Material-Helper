@@ -57,7 +57,8 @@ const App: React.FC<AppProps> = () => {
 						colors: colorPalette.reduce(
 							(acc, color, index, array) => {
 								const step = Math.round(255 / (array.length - 1))
-								acc[Math.round(step * index)] = color.substr(1) // Remove # from color
+
+								acc[Math.min(255, Math.round(step * index))] = color.substr(1) // Remove # from color
 
 								// Ensure the last entry is always at 255
 								if (index === array.length - 1) {
@@ -229,17 +230,24 @@ const App: React.FC<AppProps> = () => {
 			return
 		}
 		let command = ''
-		const materialJson: any = generateMaterialObject()
-		materialJson['parent'] = 'iron'
-		delete materialJson['key']
-		delete materialJson['translation']
 		if (is121Plus) {
-			command = `/give @p ${materialId}[miapi_material=${JSON.stringify(materialJson)}]`
+			const materialJson: any = {}
+			materialJson['parent'] = 'miapi:metal/iron'
+			materialJson['overwrite'] = generateMaterialObject()
+			delete materialJson['key']
+			delete materialJson['translation']
+			command = `/give @p ${materialId}[miapi:modular_material=${JSON.stringify(materialJson)}]`
+			navigator.clipboard.writeText(command)
+			console.log(command, materialJson)
 		} else {
+			const materialJson: any = generateMaterialObject()
+			materialJson['parent'] = 'iron'
+			delete materialJson['key']
+			delete materialJson['translation']
 			command = `/give @p ${materialId}{miapi_material:${JSON.stringify(materialJson)}}`
+			navigator.clipboard.writeText(command)
+			console.log(command, materialJson)
 		}
-		navigator.clipboard.writeText(command)
-		console.log(command, materialJson)
 		addWarning('Successfully Copied! You might want to use a command block!', '#fcba03')
 	}
 
