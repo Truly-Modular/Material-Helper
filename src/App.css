@@ -18,6 +18,28 @@ h1 {
 	padding: 10px 0;
 }
 
+.section-heading {
+	color: var(--discord-white);
+	margin: 0 0 4px 0;
+	padding: 0;
+	text-align: left;
+}
+
+.property-editor {
+	width: 100%;
+	max-width: 100%;
+	text-align: left;
+	align-self: flex-start;
+}
+
+.property-section {
+	width: 100%;
+	display: flex;
+	flex-direction: column;
+	align-items: flex-start;
+	gap: 10px;
+}
+
 a {
 	text-decoration: none !important;
 }
@@ -97,6 +119,12 @@ a {
 	border-radius: 8px;
 }
 
+.toggle-button-shell {
+	display: flex;
+	align-items: center;
+	justify-content: flex-start;
+}
+
 .toggle-switch {
 	width: 60px;
 	height: 30px;
@@ -105,6 +133,7 @@ a {
 	position: relative;
 	cursor: pointer;
 	transition: background-color 0.3s;
+	flex-shrink: 0;
 }
 
 .toggle-switch.toggled {

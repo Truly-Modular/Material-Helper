@@ -1,15 +1,16 @@
-import React, { useState } from 'react'
+import React, { useEffect, useMemo, useState } from 'react'
 import MaterialEntry from './Components/TextInputs/MaterialId'
 import MaterialDisplayName from './Components/TextInputs/MaterialDisplayName'
 import SliderEntry from './Components/Sliders/SliderEntry'
 import ColorPickerGroup from './Components/ColorPicker/ColorPickerGroup'
 import MaterialGroups from './Components/TextInputs/MaterialGroupsProps'
+import PropertyComponent from './Components/TextInputs/PropertyComponent'
 import StatBoxComponent from './Components/Displays/StatDisplays'
 import Warning from './Components/SelfDeletingWarning'
 import JSZip from 'jszip'
 import './App.css'
 import ToggleButton from './Components/Buttons/ToggleButton'
-import LoadDataProvider from './Components/Load/LoadDataProvider'
+import LoadDataProvider, { useLoadData } from './Components/Load/LoadDataProvider'
 import FileUpload from './Components/Load/FileUploadButton'
 
 interface AppProps {}
@@ -18,7 +19,8 @@ interface AppSliderState {
 	[key: string]: number | string
 }
 
-const App: React.FC<AppProps> = () => {
+const AppContent: React.FC = () => {
+	const { loadData } = useLoadData()
 	const [materialId, setMaterialId] = useState('')
 	const [materialDisplayName, setMaterialDisplayName] = useState('')
 	const [materialGroups, setMaterialGroups] = useState<string[]>(['metal'])
@@ -36,6 +38,17 @@ const App: React.FC<AppProps> = () => {
 	})
 
 	const [isAutoGenerateColors, setIsAutoGenerateColors] = useState(false)
+	const [generateConverters, setGenerateConverters] = useState(true)
+	const [propertyFields, setPropertyFields] = useState({
+		properties: {} as Record<string, unknown>,
+		display_properties: {} as Record<string, unknown>,
+		hidden_properties: {} as Record<string, unknown>
+	})
+	const [enabledPropertyFields, setEnabledPropertyFields] = useState({
+		properties: false,
+		display_properties: false,
+		hidden_properties: false
+	})
 
 	const generateMaterialObject = (): object => {
 		const cleanId = materialId.replace(':', '_')
@@ -84,6 +97,16 @@ const App: React.FC<AppProps> = () => {
 			json[key] = value
 		})
 
+		if (enabledPropertyFields.properties && Object.keys(propertyFields.properties).length > 0) {
+			json.properties = propertyFields.properties
+		}
+		if (enabledPropertyFields.display_properties && Object.keys(propertyFields.display_properties).length > 0) {
+			json.display_properties = propertyFields.display_properties
+		}
+		if (enabledPropertyFields.hidden_properties && Object.keys(propertyFields.hidden_properties).length > 0) {
+			json.hidden_properties = propertyFields.hidden_properties
+		}
+
 		if (!is121Plus) {
 			json.key = `website-${cleanId}`
 		}
@@ -105,6 +128,33 @@ const App: React.FC<AppProps> = () => {
 		setColorPalette(colors)
 	}
 
+	const hasPropertyContent = (field: 'properties' | 'display_properties' | 'hidden_properties') => {
+		return Object.keys(propertyFields[field]).length > 0
+	}
+
+	const handlePropertyFieldSubmit = (field: 'properties' | 'display_properties' | 'hidden_properties') => {
+		return (value: Record<string, unknown>) => {
+			setPropertyFields((prev) => ({
+				...prev,
+				[field]: value
+			}))
+
+			if (Object.keys(value).length > 0) {
+				setEnabledPropertyFields((prev) => ({
+					...prev,
+					[field]: true
+				}))
+			}
+		}
+	}
+
+	const togglePropertyField = (field: 'properties' | 'display_properties' | 'hidden_properties') => {
+		setEnabledPropertyFields((prev) => ({
+			...prev,
+			[field]: !prev[field]
+		}))
+	}
+
 	const buttonStyle = {
 		padding: '10px',
 		margin: '5px',
@@ -119,6 +169,67 @@ const App: React.FC<AppProps> = () => {
 		'--button-background': '#7289DA', // Discord's primary blue color
 		'--button-text-color': '#ffffff' // Discord's white color
 	}
+
+	const floatingToggleBoxStyle = {
+		display: 'flex',
+		flexDirection: 'column' as const,
+		gap: '8px',
+		padding: '10px',
+		borderRadius: '10px',
+		backgroundColor: '#2f3136',
+		border: '1px solid #3a3f4b',
+		color: '#ffffff',
+		minWidth: '280px',
+		boxShadow: '0 4px 12px rgba(0, 0, 0, 0.25)'
+	}
+
+	const floatingToggleRowStyle = {
+		display: 'flex',
+		alignItems: 'center',
+		justifyContent: 'flex-start',
+		gap: '10px',
+		padding: '6px 0'
+	}
+
+	const loadedPropertyFields = useMemo(
+		() => ({
+			properties: loadData?.properties && typeof loadData.properties === 'object' && !Array.isArray(loadData.properties) ? loadData.properties : {},
+			display_properties:
+				loadData?.display_properties && typeof loadData.display_properties === 'object' && !Array.isArray(loadData.display_properties)
+					? loadData.display_properties
+					: {},
+			hidden_properties:
+				loadData?.hidden_properties && typeof loadData.hidden_properties === 'object' && !Array.isArray(loadData.hidden_properties)
+					? loadData.hidden_properties
+					: {}
+		}),
+		[loadData]
+	)
+
+	const hasAnyPropertySectionEnabled = Object.values(enabledPropertyFields).some(Boolean)
+	const hasAnyPropertyContent = (['properties', 'display_properties', 'hidden_properties'] as const).some(
+		(field) => hasPropertyContent(field) || Object.keys(loadedPropertyFields[field]).length > 0
+	)
+	const shouldShowPropertySection = hasAnyPropertySectionEnabled || hasAnyPropertyContent
+
+	useEffect(() => {
+		if (!loadData) {
+			return
+		}
+
+		const nextEnabled = {
+			properties: Object.keys(loadedPropertyFields.properties).length > 0,
+			display_properties: Object.keys(loadedPropertyFields.display_properties).length > 0,
+			hidden_properties: Object.keys(loadedPropertyFields.hidden_properties).length > 0
+		}
+
+		setEnabledPropertyFields(nextEnabled)
+		setPropertyFields({
+			properties: loadedPropertyFields.properties as Record<string, unknown>,
+			display_properties: loadedPropertyFields.display_properties as Record<string, unknown>,
+			hidden_properties: loadedPropertyFields.hidden_properties as Record<string, unknown>
+		})
+	}, [loadData, loadedPropertyFields])
 
 	function isValidMaterial(): boolean {
 		let test = materialId.includes(':') && materialId.split(':')[1].length > 0 && materialDisplayName !== ''
@@ -232,8 +343,12 @@ const App: React.FC<AppProps> = () => {
 		let command = ''
 		if (is121Plus) {
 			const materialJson: any = {}
+			const overwriteMaterial: any = { ...generateMaterialObject() }
+			if (generateConverters) {
+				overwriteMaterial.generate_converters = true
+			}
 			materialJson['parent'] = 'miapi:metal/iron'
-			materialJson['overwrite'] = generateMaterialObject()
+			materialJson['overwrite'] = overwriteMaterial
 			delete materialJson['key']
 			delete materialJson['translation']
 			command = `/give @p ${materialId}[miapi:modular_material=${JSON.stringify(materialJson)}]`
@@ -252,116 +367,160 @@ const App: React.FC<AppProps> = () => {
 	}
 
 	return (
-		<LoadDataProvider>
-			<div>
-				<div className="Top-banner">
-					<div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', gap: '10px' }}>
-						<a
-							style={{
-								display: 'flex',
-								alignItems: 'center',
-								justifyContent: 'center',
-								color: 'white',
-								fontWeight: 'bold'
-							}}
-							href={'https://modrinth.com/organization/truly-modular'}
-							target="_blank"
-							rel="noreferrer"
-						>
-							<img src={process.env.PUBLIC_URL + '/logo_trans.png'} width={40} height={40} />
-							<span>Truly Modular Material Helper</span>
-						</a>
-						<div
-							style={{
-								display: 'flex',
-								alignItems: 'center',
-								gap: '10px',
-								fontSize: '16pt',
-								transform: 'scale(75%)'
-							}}
-						>
-							<span>1.20.1</span>
-							<ToggleButton isToggled={is121Plus} setIsToggled={setIs121Plus} />
-							<span>1.21+</span>
-						</div>
-					</div>
-					<div>
-						<FileUpload
-							onWarning={(warning, color) => {
-								addWarning(warning, color)
-							}}
-						></FileUpload>
-					</div>
-					<div style={{ ...rootStyle, display: 'flex', flexDirection: 'row' }}>
-						<button style={buttonStyle} onClick={() => generateResourcePack()}>
-							Download Data Pack
-						</button>
-						<button style={buttonStyle} onClick={() => generateMaterialJSON()}>
-							Download Material Json
-						</button>
-						<button style={buttonStyle} onClick={() => generateMaterialJSONAndCopy()}>
-							Copy Json to Clipboard
-						</button>
-						<button style={buttonStyle} onClick={() => handleGiveButtonPress()}>
-							Copy /give Command
-						</button>
+		<div>
+			<div className="Top-banner">
+				<div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', gap: '10px' }}>
+					<a
+						style={{
+							display: 'flex',
+							alignItems: 'center',
+							justifyContent: 'center',
+							color: 'white',
+							fontWeight: 'bold'
+						}}
+						href={'https://modrinth.com/organization/truly-modular'}
+						target="_blank"
+						rel="noreferrer"
+					>
+						<img src={process.env.PUBLIC_URL + '/logo_trans.png'} alt="Truly Modular logo" width={40} height={40} />
+						<span>Truly Modular Material Helper</span>
+					</a>
+					<div
+						style={{
+							display: 'flex',
+							alignItems: 'center',
+							gap: '10px',
+							fontSize: '16pt',
+							transform: 'scale(75%)'
+						}}
+					>
+						<span>1.20.1</span>
+						<ToggleButton isToggled={is121Plus} setIsToggled={setIs121Plus} />
+						<span>1.21+</span>
 					</div>
 				</div>
+				<div>
+					<FileUpload
+						onWarning={(warning, color) => {
+							addWarning(warning, color)
+						}}
+						is121Plus={is121Plus}
+					></FileUpload>
+				</div>
+				<div style={{ ...rootStyle, display: 'flex', flexDirection: 'row' }}>
+					<button style={buttonStyle} onClick={() => generateResourcePack()}>
+						Download Data Pack
+					</button>
+					<button style={buttonStyle} onClick={() => generateMaterialJSON()}>
+						Download Material Json
+					</button>
+					<button style={buttonStyle} onClick={() => generateMaterialJSONAndCopy()}>
+						Copy Json to Clipboard
+					</button>
+					<button style={buttonStyle} onClick={() => handleGiveButtonPress()}>
+						Copy /give Command
+					</button>
+				</div>
+			</div>
 
-				<div
-					style={{
-						display: 'flex',
-						flexDirection: 'row',
-						padding: '20px',
-						gap: '20px'
-					}}
-				>
-					<div id="entry-list">
-						<div style={{ display: 'flex', gap: '20px' }}>
-							<div>
-								<h1>Details</h1>
-								<div style={{ display: 'flex', flexDirection: 'column', gap: '5px' }}>
-									<div style={{ display: 'flex', gap: '5px' }}>
-										<MaterialEntry onSubmit={(entryText) => setMaterialId(entryText)} />
-										<MaterialDisplayName onSubmit={(entryText) => setMaterialDisplayName(entryText)} />
-									</div>
-									<MaterialGroups onSubmit={handleMaterialGroupsSubmit} />
+			<div
+				style={{
+					display: 'flex',
+					flexDirection: 'row',
+					padding: '20px',
+					gap: '20px'
+				}}
+			>
+				<div id="entry-list">
+					<div style={{ display: 'flex', gap: '20px' }}>
+						<div>
+							<h1>Details</h1>
+							<div style={{ display: 'flex', flexDirection: 'column', gap: '5px' }}>
+								<div style={{ display: 'flex', gap: '5px' }}>
+									<MaterialEntry onSubmit={(entryText) => setMaterialId(entryText)} />
+									<MaterialDisplayName onSubmit={(entryText) => setMaterialDisplayName(entryText)} />
 								</div>
+								<MaterialGroups onSubmit={handleMaterialGroupsSubmit} />
 							</div>
-							<ColorPickerGroup
-								initialColors={colorPalette}
-								onSubmit={handleColorPaletteSubmit}
-								setColorAutoGenerate={setIsAutoGenerateColors}
-								autoGenerateColors={isAutoGenerateColors}
-							/>
 						</div>
+						<ColorPickerGroup
+							initialColors={colorPalette}
+							onSubmit={handleColorPaletteSubmit}
+							setColorAutoGenerate={setIsAutoGenerateColors}
+							autoGenerateColors={isAutoGenerateColors}
+						/>
+					</div>
 
-						<div style={{ display: 'flex', gap: '20px' }}>
+					<div style={{ display: 'flex', gap: '20px', alignItems: 'flex-start' }}>
+						<div style={{ display: 'flex', flexDirection: 'column', gap: '20px', flex: '1 1 420px', alignItems: 'stretch' }}>
 							<div>
 								<h1>Stats</h1>
 								<SliderEntry onSubmit={handleSliderSubmit} is121Plus={is121Plus} setIs121Plus={setIs121Plus} />
 							</div>
-							<div>
-								<h1>Previews</h1>
-								{isAutoGenerateColors && (
-									<div style={{ marginBottom: '5px', color: 'var(--warning-red)', fontWeight: 'bold' }}>
-										Previews aren't representing ingame colors anymore, since automatic generation is toggled!
-									</div>
-								)}
-								<StatBoxComponent sliderValues={sliderValues} colorPalette={colorPalette} translation={materialDisplayName} is121={is121Plus} />
-							</div>
+							{shouldShowPropertySection && (
+								<div
+									className="property-section"
+									style={{ width: '100%', maxWidth: '560px', display: 'flex', flexDirection: 'column', alignItems: 'stretch', gap: '10px' }}
+								>
+									<h2 className="section-heading">Properties</h2>
+									{(['properties', 'display_properties', 'hidden_properties'] as const)
+										.filter(
+											(field) => enabledPropertyFields[field] || hasPropertyContent(field) || Object.keys(loadedPropertyFields[field]).length > 0
+										)
+										.map((field) => (
+											<PropertyComponent
+												key={field}
+												label={field}
+												initialValue={loadedPropertyFields[field] as Record<string, unknown>}
+												onSubmit={handlePropertyFieldSubmit(field)}
+											/>
+										))}
+								</div>
+							)}
+						</div>
+						<div style={{ flex: '0 0 420px' }}>
+							<h1>Previews</h1>
+							{isAutoGenerateColors && (
+								<div style={{ marginBottom: '5px', color: 'var(--warning-red)', fontWeight: 'bold' }}>
+									Previews aren't representing ingame colors anymore, since automatic generation is toggled!
+								</div>
+							)}
+							<StatBoxComponent sliderValues={sliderValues} colorPalette={colorPalette} translation={materialDisplayName} is121={is121Plus} />
 						</div>
 					</div>
-					<div style={{ position: 'fixed', top: 100, right: 15, zIndex: 9999 }}>
-						{warnings.map((warning) => (
-							<Warning key={warning.id} id={warning.id} message={warning.message} onRemove={removeWarning} color={warning.color} />
+				</div>
+				<div style={{ position: 'fixed', top: 100, right: 15, zIndex: 9999, display: 'flex', flexDirection: 'column', gap: '8px' }}>
+					<div style={floatingToggleBoxStyle}>
+						<div style={{ fontSize: '12px', textTransform: 'uppercase', letterSpacing: '0.08em', color: '#b9bbbe', marginBottom: '4px' }}>
+							Toggles
+						</div>
+						{is121Plus && (
+							<div style={floatingToggleRowStyle}>
+								<ToggleButton isToggled={generateConverters} setIsToggled={setGenerateConverters} />
+								<span style={{ fontWeight: 600, color: '#ffffff' }}>Generate converters</span>
+							</div>
+						)}
+						{(['properties', 'display_properties', 'hidden_properties'] as const).map((field) => (
+							<div key={field} style={floatingToggleRowStyle}>
+								<ToggleButton isToggled={enabledPropertyFields[field]} setIsToggled={() => togglePropertyField(field)} />
+								<span style={{ textTransform: 'capitalize', fontWeight: 600, color: '#ffffff' }}>{field}</span>
+							</div>
 						))}
 					</div>
-					<div style={{ display: 'flex', flexDirection: 'column', gap: '35px' }}></div>
+					{warnings.map((warning) => (
+						<Warning key={warning.id} id={warning.id} message={warning.message} onRemove={removeWarning} color={warning.color} />
+					))}
 				</div>
+				<div style={{ display: 'flex', flexDirection: 'column', gap: '35px' }}></div>
 			</div>
-		</LoadDataProvider>
+		</div>
 	)
 }
+
+const App: React.FC<AppProps> = () => (
+	<LoadDataProvider>
+		<AppContent />
+	</LoadDataProvider>
+)
 
 export default App

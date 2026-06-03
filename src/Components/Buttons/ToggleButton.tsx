@@ -4,7 +4,7 @@ const ToggleButton = ({ isToggled, setIsToggled }: { isToggled: boolean; setIsTo
 	}
 
 	return (
-		<div className="App">
+		<div className="toggle-button-shell">
 			<div className={`toggle-switch ${isToggled ? 'toggled' : ''}`} onClick={handleToggle}>
 				<div className="toggle-knob"></div>
 			</div>

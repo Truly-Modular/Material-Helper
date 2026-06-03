@@ -53,58 +53,51 @@ const SliderEntry: React.FC<SliderEntryProps> = ({ onSubmit, is121Plus }) => {
 	useEffect(() => {
 		const excludeKeys: string[] = ['key', 'translation', 'fake_translation']
 		const baseSlider: string[] = is121Plus
-			? ['hardness', 'flexibility', 'density', 'durability', 'mining_speed']
+			? ['hardness', 'flexibility', 'density', 'durability', 'mining_speed', 'mining_level']
 			: ['hardness', 'flexibility', 'density', 'durability', 'tier', 'mining_speed', 'mining_level']
 
 		if (loadData != null) {
-			const entries = Object.entries(loadData)
+			const excludedKeys = new Set(['key', 'translation', 'fake_translation', 'color', 'color_palette', 'icon', 'items', 'groups'])
+			const entries = Object.entries(loadData).filter(([key]) => !excludedKeys.has(key))
 			const filteredEntries = entries.filter(([key]) => !excludeKeys.includes(key))
 			const baseSliders = filteredEntries.filter(([key]) => baseSlider.includes(key))
 			const customEntries = filteredEntries.filter(([key]) => !baseSlider.includes(key))
 
 			baseSliders.forEach(([key, value]) => {
-				if (typeof value === 'number') {
+				if (typeof value === 'number' || typeof value === 'string') {
 					handleSliderChange(key, value)
 				}
 			})
 
-			let sliders = { ...customSliders }
+			const sliders: Record<string, { id: string; name: string; value: any; type: CustomSliderType }> = {}
+			const usedNames = new Set<string>(baseSlider)
 
-			if (is121Plus) {
-				// Add string-based mining_level
+			customEntries.forEach(([key, value]) => {
+				if (typeof value !== 'number' && typeof value !== 'string') {
+					return
+				}
+
+				if (usedNames.has(key)) {
+					return
+				}
+
+				usedNames.add(key)
+
 				let uuid
 				do {
 					uuid = generateId()
 				} while (sliders[uuid] !== undefined)
 				sliders[uuid] = {
 					id: uuid,
-					name: 'mining_level',
-					value: 'minecraft:incorrect_for_wooden_tools',
-					type: CustomSliderType.STRING
-				}
-			} else {
-				// Remove string-based mining_level if switching back
-				sliders = Object.fromEntries(Object.entries(sliders).filter(([_, slider]) => slider.name !== 'mining_level'))
-			}
-
-			customEntries.forEach(([key, value]) => {
-				if (typeof value === 'number' || typeof value === 'string') {
-					let uuid
-					do {
-						uuid = generateId()
-					} while (sliders[uuid] !== undefined)
-					sliders[uuid] = {
-						id: uuid,
-						name: key,
-						value: value,
-						type: typeof value === 'number' ? CustomSliderType.FLOAT : CustomSliderType.STRING
-					}
+					name: key,
+					value,
+					type: typeof value === 'number' ? CustomSliderType.FLOAT : CustomSliderType.STRING
 				}
 			})
 
 			setCustomSliders(sliders)
 		}
-	}, [loadData, is121Plus]) // <-- add is121Plus to deps
+	}, [loadData, is121Plus])
 
 	const handleSliderChange = (sliderName: string, newValue: number | string) => {
 		setSliderValues((prevValues) => ({
@@ -147,12 +140,15 @@ const SliderEntry: React.FC<SliderEntryProps> = ({ onSubmit, is121Plus }) => {
 	}, [sliderValues, customSliders])
 
 	useEffect(() => {
-		if (is121Plus) {
-			handleSliderChange('mining_level', 'minecraft:incorrect_for_wooden_tool')
-		} else {
-			handleSliderChange('mining_level', 2)
+		const loadedMiningLevel = loadData?.mining_level
+
+		if (loadedMiningLevel !== undefined) {
+			handleSliderChange('mining_level', is121Plus ? String(loadedMiningLevel) : Number(loadedMiningLevel))
+			return
 		}
-	}, [is121Plus])
+
+		handleSliderChange('mining_level', is121Plus ? 'minecraft:incorrect_for_wooden_tool' : 2)
+	}, [is121Plus, loadData])
 
 	useEffect(() => {
 		const handleClickOutside = (event: MouseEvent) => {
