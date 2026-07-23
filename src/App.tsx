@@ -418,9 +418,9 @@ const AppContent: React.FC = () => {
 			</header>
 
 			<main
+				className="main-grid"
 				style={{
 					display: 'grid',
-					gridTemplateColumns: 'minmax(0,1fr) 420px',
 					gap: '22px',
 					padding: '24px 28px 60px',
 					alignItems: 'start'
@@ -481,9 +481,9 @@ const AppContent: React.FC = () => {
 
 					<section
 						className="card-section"
-						style={{ minHeight: propertiesMinHeight, display: 'flex', flexDirection: 'column', gap: '16px' }}
+						style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}
 					>
-						<h2 className="section-heading">Properties</h2>
+						<h2 className="section-heading" style={{userSelect: 'none'}}>Properties</h2>
 						{propertyFieldOrder.map((field) => (
 							<PropertyComponent
 								key={field}

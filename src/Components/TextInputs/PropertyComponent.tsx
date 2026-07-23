@@ -73,7 +73,7 @@ const PropertyComponent: React.FC<PropertyComponentProps> = ({ label, descriptio
 		<div className="property-editor">
 			<div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '8px' }}>
 				<ToggleButton isToggled={enabled} setIsToggled={onToggle} />
-				<span style={{ fontWeight: 600, fontSize: '13px', textTransform: 'capitalize', color: 'var(--text)' }}>{label.replace(/_/g, ' ')}</span>
+				<span style={{ userSelect: 'none', fontWeight: 600, fontSize: '13px', textTransform: 'capitalize', color: 'var(--text)' }}>{label.replace(/_/g, ' ')}</span>
 			</div>
 			{enabled && (
 				<div>

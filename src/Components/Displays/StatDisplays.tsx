@@ -76,7 +76,7 @@ const StatBoxComponent: React.FC<StatBox> = ({ sliderValues, colorPalette, trans
 						headerText={translation + 'Helmet'}
 						lines={[
 							{
-								text: 'Armor                : ' + Math.floor(sliderValues.hardness / 2).toFixed(2)
+								text: 'Armor                  : ' + Math.floor(sliderValues.hardness / 2).toFixed(2)
 							},
 							{
 								text:
@@ -108,7 +108,7 @@ const StatBoxComponent: React.FC<StatBox> = ({ sliderValues, colorPalette, trans
 						headerText={translation + 'Chestplate'}
 						lines={[
 							{
-								text: 'Armor                : ' + (sliderValues.hardness + 2 - Math.ceil(sliderValues.flexibility / 4)).toFixed(2)
+								text: 'Armor                  : ' + (sliderValues.hardness + 2 - Math.ceil(sliderValues.flexibility / 4)).toFixed(2)
 							},
 							{
 								text:
@@ -141,7 +141,7 @@ const StatBoxComponent: React.FC<StatBox> = ({ sliderValues, colorPalette, trans
 						lines={[
 							{
 								text:
-									'Armor                : ' +
+									'Armor                  : ' +
 									(((sliderValues.hardness - Math.ceil(sliderValues.hardness / 6.5) + Math.ceil(sliderValues.hardness / 4.5) - 1) / 7) * 7).toFixed(2)
 							},
 							{
@@ -174,7 +174,7 @@ const StatBoxComponent: React.FC<StatBox> = ({ sliderValues, colorPalette, trans
 						headerText={translation + 'Boots'}
 						lines={[
 							{
-								text: 'Armor                : ' + Math.floor(sliderValues.hardness / 2 - Math.floor(sliderValues.density / 4)).toFixed(2)
+								text: 'Armor                  : ' + Math.floor(sliderValues.hardness / 2 - Math.floor(sliderValues.density / 4)).toFixed(2)
 							},
 							{
 								text:
