@@ -264,9 +264,20 @@ const SliderEntry: React.FC<SliderEntryProps> = ({ onSubmit, is121Plus }) => {
 			}
 
 			return (
-				<div key={slider.id} style={{ display: 'flex', gap: '5px', justifyItems: 'center' }}>
-					<div
-						style={{ cursor: 'pointer' }}
+				<div
+					key={slider.id}
+					style={{
+						display: 'flex',
+						alignItems: 'center',
+						gap: '10px',
+						background: 'var(--input-bg)',
+						border: '1px solid var(--input-border)',
+						borderRadius: '9px',
+						padding: '10px 12px'
+					}}
+				>
+					<button
+						type="button"
 						onClick={() => {
 							setCustomSliders((prevSliders) => {
 								const newSliders = { ...prevSliders }
@@ -274,9 +285,10 @@ const SliderEntry: React.FC<SliderEntryProps> = ({ onSubmit, is121Plus }) => {
 								return newSliders
 							})
 						}}
+						style={{ background: 'none', border: 'none', color: 'var(--red)', cursor: 'pointer', padding: 0, flexShrink: 0, display: 'flex' }}
 					>
 						<DeleteIcon />
-					</div>
+					</button>
 					{sliderComponent}
 				</div>
 			)
@@ -288,38 +300,32 @@ const SliderEntry: React.FC<SliderEntryProps> = ({ onSubmit, is121Plus }) => {
 	}
 
 	return (
-		<div
-			className="entry"
-			style={{
-				position: 'relative',
-				backgroundColor: 'var(--discord-gray-2)',
-				borderRadius: '8px',
-				padding: '10px',
-				color: 'var(--discord-white)'
-			}}
-		>
-			<SingleSlider label="Hardness" value={sliderValues.hardness} onChange={(value) => handleSliderChange('hardness', value)} />
-			<SingleSlider label="Density" value={sliderValues.density} onChange={(value) => handleSliderChange('density', value)} />
-			<SingleSlider label="Flexibility" value={sliderValues.flexibility} onChange={(value) => handleSliderChange('flexibility', value)} />
-			<HighLimitSliderEntry label="Durability" value={sliderValues.durability} onChange={(value) => handleSliderChange('durability', value)} />
-			<SingleSlider label="Mining Speed" value={sliderValues.mining_speed} onChange={(value) => handleSliderChange('mining_speed', value)} />
-			{is121Plus ? (
-				<StringStatEntry
-					label="Mining Level"
-					value={String(sliderValues.mining_level)}
-					onChange={(value) => handleSliderChange('mining_level', value)}
-					editableLabel={false}
-				/>
-			) : (
-				<IntegerSliderEntry
-					label="Mining Level"
-					value={typeof sliderValues.mining_level === 'number' ? sliderValues.mining_level : 2}
-					onChange={(value) => handleSliderChange('mining_level', value)}
-				/>
-			)}
+		<div>
+			<div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px 20px' }}>
+				<SingleSlider label="Hardness" value={sliderValues.hardness} onChange={(value) => handleSliderChange('hardness', value)} />
+				<SingleSlider label="Density" value={sliderValues.density} onChange={(value) => handleSliderChange('density', value)} />
+				<SingleSlider label="Flexibility" value={sliderValues.flexibility} onChange={(value) => handleSliderChange('flexibility', value)} />
+				<HighLimitSliderEntry label="Durability" value={sliderValues.durability} onChange={(value) => handleSliderChange('durability', value)} />
+				<SingleSlider label="Mining Speed" value={sliderValues.mining_speed} onChange={(value) => handleSliderChange('mining_speed', value)} />
+				{is121Plus ? (
+					<StringStatEntry
+						label="Mining Level"
+						value={String(sliderValues.mining_level)}
+						onChange={(value) => handleSliderChange('mining_level', value)}
+						editableLabel={false}
+					/>
+				) : (
+					<IntegerSliderEntry
+						label="Mining Level"
+						value={typeof sliderValues.mining_level === 'number' ? sliderValues.mining_level : 2}
+						onChange={(value) => handleSliderChange('mining_level', value)}
+					/>
+				)}
+			</div>
 
-			{renderCustomSliders()}
-			<div style={{ position: 'relative' }}>
+			<div style={{ display: 'flex', flexDirection: 'column', gap: '12px', marginTop: '18px' }}>{renderCustomSliders()}</div>
+
+			<div style={{ position: 'relative', marginTop: '12px' }}>
 				<button
 					ref={dropdownButtonRef}
 					onClick={(e) => {
@@ -328,59 +334,61 @@ const SliderEntry: React.FC<SliderEntryProps> = ({ onSubmit, is121Plus }) => {
 					}}
 					style={{
 						width: '100%',
-						height: '30px',
-						backgroundColor: 'var(--discord-gray-3)',
-						color: '#ffffff',
-						border: 'none',
-						borderRadius: '5px',
-						cursor: 'pointer'
+						padding: '9px',
+						borderRadius: '8px',
+						border: '1px dashed var(--input-border)',
+						background: 'var(--input-bg)',
+						color: 'var(--text-secondary)',
+						cursor: 'pointer',
+						fontSize: '13px',
+						fontWeight: 600
 					}}
 				>
-					<span style={{ fontSize: '14pt' }}>+</span>
+					+ Add custom stat
 				</button>
 				{isDropdownOpen && (
 					<div
 						ref={dropdownRef}
 						style={{
 							position: 'absolute',
-							top: '35px', // Adjust the position as needed
-							left: '0',
-							backgroundColor: 'var(--discord-gray-3)',
-							// border: "1px solid #ccc",
-							borderRadius: '5px',
-							boxShadow: '0 2px 5px rgba(0, 0, 0, 0.2)',
-							zIndex: 1,
-							width: '100%' // Make the dropdown the same width as the button
+							top: 'calc(100% + 6px)',
+							left: 0,
+							right: 0,
+							zIndex: 10,
+							background: 'var(--input-bg)',
+							border: '1px solid var(--input-border)',
+							borderRadius: '8px',
+							overflow: 'hidden',
+							boxShadow: '0 10px 24px rgba(0, 0, 0, 0.4)'
 						}}
 					>
-						<ul style={{ listStyle: 'none', padding: '10px', margin: 0 }}>
-							{Object.keys(CustomSliderType)
-								.filter((key) => isNaN(Number(key)))
-								.map((key) => (
-									<li
-										key={key}
-										onClick={() => {
-											let uuid
-											do {
-												uuid = generateId()
-											} while (customSliders[uuid] !== undefined)
-											setCustomSliders({
-												...customSliders,
-												[uuid]: {
-													id: uuid,
-													name: 'new',
-													value: key === 'STRING' ? '' : 0,
-													type: CustomSliderType[key as keyof typeof CustomSliderType]
-												}
-											})
-											setIsDropdownOpen(false)
-										}}
-										className="dropdown-item"
-									>
-										{key}
-									</li>
-								))}
-						</ul>
+						{Object.keys(CustomSliderType)
+							.filter((key) => isNaN(Number(key)))
+							.map((key) => (
+								<div
+									key={key}
+									onClick={() => {
+										let uuid
+										do {
+											uuid = generateId()
+										} while (customSliders[uuid] !== undefined)
+										setCustomSliders({
+											...customSliders,
+											[uuid]: {
+												id: uuid,
+												name: 'new',
+												value: key === 'STRING' ? '' : 0,
+												type: CustomSliderType[key as keyof typeof CustomSliderType]
+											}
+										})
+										setIsDropdownOpen(false)
+									}}
+									className="dropdown-item"
+									style={{ textTransform: 'capitalize' }}
+								>
+									{key.toLowerCase()}
+								</div>
+							))}
 					</div>
 				)}
 			</div>
@@ -393,8 +401,8 @@ export default SliderEntry
 const DeleteIcon = (props: any) => (
 	<svg
 		xmlns="http://www.w3.org/2000/svg"
-		width="24"
-		height="24"
+		width="16"
+		height="16"
 		viewBox="0 0 24 24"
 		fill="none"
 		stroke="currentColor"

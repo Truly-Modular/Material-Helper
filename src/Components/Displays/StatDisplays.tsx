@@ -36,10 +36,8 @@ const StatBoxComponent: React.FC<StatBox> = ({ sliderValues, colorPalette, trans
 	}
 
 	return (
-		<div id="display">
-			<div style={{ display: 'flex', gap: '20px' }}>
-				<div id="display-list" style={{ flex: 1 }}>
-					<CustomComponent
+		<div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+			<CustomComponent
 						imageProps={{
 							imageUrl: process.env.PUBLIC_URL + '/images/sword.png',
 							colorPalette: colorPalette
@@ -70,8 +68,6 @@ const StatBoxComponent: React.FC<StatBox> = ({ sliderValues, colorPalette, trans
 							{ text: 'Mining Speed  : ' + sliderValues.mining_speed }
 						]}
 					/>
-				</div>
-				<div id="display-list" style={{ flex: 2 }}>
 					<CustomComponent
 						imageProps={{
 							imageUrl: process.env.PUBLIC_URL + '/images/helmet.png',
@@ -202,8 +198,6 @@ const StatBoxComponent: React.FC<StatBox> = ({ sliderValues, colorPalette, trans
 							}
 						]}
 					/>
-				</div>
-			</div>
 		</div>
 	)
 }

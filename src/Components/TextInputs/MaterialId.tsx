@@ -48,16 +48,8 @@ const MaterialEntry: React.FC<MaterialEntryProps> = ({ onSubmit }) => {
 	}
 
 	return (
-		<div
-			className="entry special-text"
-			style={{
-				position: 'relative',
-				backgroundColor: 'var(--discord-gray-2)',
-				borderRadius: '8px',
-				padding: '10px'
-			}}
-		>
-			<label htmlFor="materialInput" style={{ display: 'block', color: 'var(--discord-white)', marginBottom: '5px' }}>
+		<div>
+			<label htmlFor="materialInput" className="field-label">
 				Material Item ID
 			</label>
 			<input
@@ -66,15 +58,8 @@ const MaterialEntry: React.FC<MaterialEntryProps> = ({ onSubmit }) => {
 				value={entryText}
 				onChange={handleInputChange}
 				placeholder="modid:item_id"
-				style={{
-					backgroundColor: 'var(--discord-gray-3)',
-					color: 'var(--discord-white)',
-					border: 'none',
-					width: '90%',
-					padding: '10px',
-					borderRadius: '8px',
-					outline: 'none' // Remove default focus outline
-				}}
+				className="field-input"
+				style={{ fontFamily: 'ui-monospace, Menlo, monospace' }}
 			/>
 		</div>
 	)

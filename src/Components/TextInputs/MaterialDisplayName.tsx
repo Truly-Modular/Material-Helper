@@ -34,34 +34,11 @@ const MaterialDisplayName: React.FC<MaterialDisplayNameProps> = ({ onSubmit }) =
 	}
 
 	return (
-		<div
-			className="entry special-text"
-			style={{
-				position: 'relative',
-				backgroundColor: 'var(--discord-gray-2)',
-				borderRadius: '8px',
-				padding: '10px'
-			}}
-		>
-			<label htmlFor="materialNameInput" style={{ display: 'block', color: 'var(--discord-white)', marginBottom: '5px' }}>
+		<div>
+			<label htmlFor="materialNameInput" className="field-label">
 				Material Display Name
 			</label>
-			<input
-				type="text"
-				id="materialNameInput"
-				value={displayName}
-				onChange={handleInputChange}
-				placeholder="Cool Name"
-				style={{
-					backgroundColor: 'var(--discord-gray-3)',
-					color: 'var(--discord-white)',
-					border: 'none',
-					width: '90%',
-					padding: '10px',
-					borderRadius: '8px',
-					outline: 'none' // Remove default focus outline
-				}}
-			/>
+			<input type="text" id="materialNameInput" value={displayName} onChange={handleInputChange} placeholder="Cool Name" className="field-input" />
 		</div>
 	)
 }

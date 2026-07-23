@@ -71,68 +71,87 @@ const ColorPickerGroup: React.FC<ColorPickerGroupProps> = ({ initialColors, onSu
 	}
 
 	return (
-		<div>
-			<h1>Material Colors</h1>
-			<div className="entry">
-				{/* Generate Automatically Checkbox and Plus/Minus Buttons */}
-				<div
-					style={{
-						display: 'flex',
-						justifyContent: 'space-between', // Space between elements
-						alignItems: 'center', // Align items vertically in the center
-						margin: '10px 20px' // Adjust margins as needed
-					}}
-				>
-					{/* Left-aligned checkbox */}
-					<div style={{ display: 'flex', alignItems: 'center' }}>
-						<label style={{ marginRight: '5px' }}>Generate Automatically</label>
-						<input type="checkbox" checked={autoGenerateColors} onChange={(e) => setColorAutoGenerate(e.target.checked)} />
-					</div>
-
-					{/* Right-aligned buttons */}
-					<div>
-						<button onClick={addColor} disabled={gradientColors.length >= 10 || autoGenerateColors} style={{ marginRight: '10px' }}>
+		<section className="card-section">
+			<div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '14px', flexWrap: 'wrap', gap: '10px' }}>
+				<h2 className="section-heading">Material Colors</h2>
+				<div style={{ display: 'flex', alignItems: 'center', gap: '14px' }}>
+					<label style={{ display: 'flex', alignItems: 'center', gap: '7px', fontSize: '12.5px', color: 'var(--text-secondary)', cursor: 'pointer' }}>
+						<input
+							type="checkbox"
+							checked={autoGenerateColors}
+							onChange={(e) => setColorAutoGenerate(e.target.checked)}
+							style={{ accentColor: 'var(--accent)', width: '15px', height: '15px', cursor: 'pointer' }}
+						/>
+						Generate Automatically
+					</label>
+					<div style={{ display: 'flex', gap: '6px' }}>
+						<button
+							onClick={addColor}
+							disabled={gradientColors.length >= 10 || autoGenerateColors}
+							style={{
+								width: '28px',
+								height: '28px',
+								borderRadius: '6px',
+								border: '1px solid var(--input-border)',
+								background: 'var(--input-bg)',
+								color: 'var(--text)',
+								cursor: 'pointer',
+								fontSize: '14px'
+							}}
+						>
 							+
 						</button>
-						<button onClick={removeColor} disabled={gradientColors.length <= 1 || autoGenerateColors}>
-							-
+						<button
+							onClick={removeColor}
+							disabled={gradientColors.length <= 2 || autoGenerateColors}
+							style={{
+								width: '28px',
+								height: '28px',
+								borderRadius: '6px',
+								border: '1px solid var(--input-border)',
+								background: 'var(--input-bg)',
+								color: 'var(--text)',
+								cursor: 'pointer',
+								fontSize: '14px'
+							}}
+						>
+							−
 						</button>
 					</div>
 				</div>
-				{/* Color Pickers */}
-				<div
-					style={{
-						margin: '20px',
-						marginTop: '0px',
-						display: 'flex',
-						flexDirection: 'row',
-						justifyContent: 'space-between'
-					}}
-				>
-					{gradientColors.map((color, index) => (
-						<ColorPicker
-							key={colorPickerKeys[index]}
-							initialColor={color}
-							onChange={(newColor) => handleColorChange(index, newColor)}
-							disabled={autoGenerateColors}
-						/>
-					))}
-				</div>
-				{/* Banner with dynamic gradient background */}
-				<div
-					style={{
-						marginLeft: '10px',
-						marginRight: '10px',
-						height: '50px', // Adjust the height as needed
-						background: `linear-gradient(to right, ${gradientColors.join(', ')})`,
-						borderRadius: '8px', // Optional: Add rounded corners
-						filter: autoGenerateColors ? 'grayscale(100%)' : 'none',
-						opacity: autoGenerateColors ? 0.5 : 1,
-						position: 'relative'
-					}}
-				/>
 			</div>
-		</div>
+			{/* Color Pickers */}
+			<div
+				style={{
+					display: 'flex',
+					gap: '10px',
+					flexWrap: 'wrap',
+					marginBottom: '14px',
+					opacity: autoGenerateColors ? 0.5 : 1,
+					filter: autoGenerateColors ? 'grayscale(100%)' : 'none'
+				}}
+			>
+				{gradientColors.map((color, index) => (
+					<ColorPicker
+						key={colorPickerKeys[index] ?? index}
+						initialColor={color}
+						onChange={(newColor) => handleColorChange(index, newColor)}
+						disabled={autoGenerateColors}
+					/>
+				))}
+			</div>
+			{/* Banner with dynamic gradient background */}
+			<div
+				style={{
+					height: '40px',
+					borderRadius: '8px',
+					border: '1px solid var(--input-border)',
+					background: `linear-gradient(to right, ${gradientColors.join(', ')})`,
+					opacity: autoGenerateColors ? 0.5 : 1,
+					filter: autoGenerateColors ? 'grayscale(100%)' : 'none'
+				}}
+			/>
+		</section>
 	)
 }
 
