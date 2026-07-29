@@ -1,122 +1,123 @@
 :root {
-	--discord-white: #ffffff; /* Discord's white color */
-	--discord-blue: #7289da; /* Discord's primary blue color */
-	--discord-gray-1: #424549; /* Discord's primary blue color */
-	--discord-gray-2: #36393e; /* Discord's primary blue color */
-	--discord-gray-3: #282b30; /* Discord's primary blue color */
-	--discord-gray-4: #1e2124; /* Discord's primary blue color */
-	--warning-red: #e32727;
+	--bg: #16171a;
+	--card-bg: #1d1f23;
+	--card-border: #26282e;
+	--input-bg: #25272c;
+	--input-border: #34363c;
+	--text: #f3f2ef;
+	--text-muted: #9a9da4;
+	--text-secondary: #c7c9ce;
+	--accent: #3fb4c9;
+	--accent-text: #1b1408;
+	--red: #e2585c;
+	--green: #5cb37a;
+	--orange: #e0aa4a;
+	--warning-red: #e2585c;
+}
+
+@keyframes toastSlideIn {
+	from {
+		opacity: 0;
+		transform: translateY(8px);
+	}
+	to {
+		opacity: 1;
+		transform: translateY(0);
+	}
 }
 
 body {
-	background-color: '--discord-gray-1'; /* Replace #ffffff with the color code or name of your desired background color */
+	background-color: var(--bg);
+	margin: 0;
+}
+
+::selection {
+	background: var(--accent);
+	color: var(--accent-text);
 }
 
 h1 {
-	color: var(--discord-white);
+	color: var(--text);
 	margin: 0;
 	padding: 10px 0;
 }
 
 .section-heading {
-	color: var(--discord-white);
-	margin: 0 0 4px 0;
-	padding: 0;
-	text-align: left;
+	margin: 0;
+	font-size: 14px;
+	font-weight: 700;
+	color: var(--text);
+	text-transform: uppercase;
+	letter-spacing: 0.04em;
 }
 
 .property-editor {
 	width: 100%;
 	max-width: 100%;
 	text-align: left;
-	align-self: flex-start;
 }
 
 .property-section {
 	width: 100%;
 	display: flex;
 	flex-direction: column;
-	align-items: flex-start;
-	gap: 10px;
+	align-items: stretch;
+	gap: 16px;
 }
 
 a {
 	text-decoration: none !important;
 }
 
-/* styles.css */
-
-/* styles.css */
-
 .dropdown-item {
-	padding: 5px;
+	padding: 10px 14px;
+	font-size: 13px;
 	cursor: pointer;
+	color: var(--text);
 }
 
 .dropdown-item:hover {
-	background-color: var(--discord-gray-2);
+	background-color: var(--input-bg);
 }
 
-.Top-banner {
-	background-color: var(--discord-gray-3);
-	color: var(--discord-white);
-	text-align: left; /* Align text to the left */
-	padding: 20px; /* Increase header padding for a larger header */
+.chip {
 	display: flex;
-	justify-content: space-between; /* Add space between text and the right edge */
-	align-items: center; /* Center vertically */
+	align-items: center;
+	gap: 6px;
+	background: var(--input-bg);
+	border: 1px solid var(--input-border);
+	border-radius: 999px;
+	padding: 4px 6px 4px 12px;
+	font-size: 12px;
+	color: var(--text);
 }
 
-#entry-list {
+.chip button {
+	background: none;
+	border: none;
+	color: var(--text-muted);
+	cursor: pointer;
+	font-size: 13px;
+	padding: 0 4px;
+}
+
+.segmented-control {
 	display: flex;
-	flex-direction: column;
-	align-items: flex-start; /* Align entries to the left */
-	background-color: var(--discord-gray-1);
+	align-items: center;
+	gap: 2px;
+	background: var(--input-bg);
+	border: 1px solid var(--input-border);
+	border-radius: 9px;
+	padding: 3px;
 }
 
-#display {
-	display: flex;
-	flex-direction: column;
-	align-items: flex-start; /* Align entries to the left */
-	background-color: var(--discord-gray-1);
-	color: var(--discord-white);
-	/* width: 100vw; Stretch the entry list to the bottom of the screen */
-}
-
-#display-list {
-	display: flex;
-	flex-direction: column;
-	align-items: flex-start; /* Align entries to the left */
-	background-color: var(--discord-gray-1);
-	color: var(--discord-white);
-	width: 420px; /* Stretch the entry list to the bottom of the screen */
-}
-
-.entry {
-	/* margin-bottom: 10px; */
-	padding: 10px;
-	background-color: var(--discord-gray-2);
-	width: 500px;
-	text-align: left;
-	color: var(--discord-white);
-	display: flex;
-	flex-direction: column;
-	gap: 5px;
-	border-radius: 8px;
-}
-
-.special-text {
-	width: 237.5px !important;
-}
-
-#entry {
-	margin-bottom: 10px;
-	padding: 10px;
-	width: 400px;
-	background-color: var(--discord-gray-2);
-	text-align: left;
-	color: var(--discord-white);
-	border-radius: 8px;
+.segmented-control button {
+	border: none;
+	border-radius: 6px;
+	padding: 7px 14px;
+	font-size: 12.5px;
+	font-weight: 600;
+	cursor: pointer;
 }
 
 .toggle-button-shell {
@@ -126,33 +127,130 @@ a {
 }
 
 .toggle-switch {
-	width: 60px;
-	height: 30px;
-	background-color: #ccc;
-	border-radius: 30px;
+	width: 34px;
+	height: 19px;
+	background-color: var(--input-border);
+	border-radius: 999px;
 	position: relative;
 	cursor: pointer;
-	transition: background-color 0.3s;
+	transition: background-color 0.2s;
 	flex-shrink: 0;
 }
 
 .toggle-switch.toggled {
-	background-color: var(--discord-blue);
+	background-color: var(--accent);
 }
 
 .toggle-knob {
-	width: 28px;
-	height: 28px;
-	background-color: white;
+	width: 15px;
+	height: 15px;
+	background-color: var(--text);
 	border-radius: 50%;
 	position: absolute;
-	top: 1px;
-	left: 1px;
-	transition: left 0.3s;
+	top: 2px;
+	left: 2px;
+	transition: left 0.2s;
 }
 
 .toggle-switch.toggled .toggle-knob {
-	left: 31px;
+	left: 17px;
+}
+
+.toggle-switch.toggle-switch-lg {
+	width: 38px;
+	height: 21px;
+}
+
+.toggle-switch.toggle-switch-lg .toggle-knob {
+	width: 17px;
+	height: 17px;
+}
+
+.toggle-switch.toggle-switch-lg.toggled .toggle-knob {
+	left: 19px;
+}
+
+.main-grid {
+	grid-template-columns: minmax(0, 1fr) 33vw;
+}
+
+@media (max-width: 820px) {
+	.main-grid {
+		grid-template-columns: 1fr;
+	}
+}
+
+.card-section {
+	background: var(--card-bg);
+	border: 1px solid var(--card-border);
+	border-radius: 12px;
+	padding: 20px;
+}
+
+.header-button {
+	height: 36px;
+	padding: 0 14px;
+	border-radius: 7px;
+	border: 1px solid var(--input-border);
+	background: var(--input-bg);
+	color: var(--text);
+	font-size: 12.5px;
+	font-weight: 600;
+	cursor: pointer;
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+}
+
+.header-button-primary {
+	border: none;
+	background: var(--accent);
+	color: var(--accent-text);
+	font-weight: 700;
+}
+
+.field-label {
+	display: block;
+	font-size: 12px;
+	color: var(--text-muted);
+	margin-bottom: 6px;
+}
+
+.field-input {
+	width: 100%;
+	box-sizing: border-box;
+	background: var(--input-bg);
+	border: 1px solid var(--input-border);
+	color: var(--text);
+	border-radius: 8px;
+	padding: 10px 12px;
+	font-size: 13px;
+	outline: none;
+}
+
+.preview-card {
+	display: flex;
+	gap: 12px;
+	background: var(--card-bg);
+	border: 1px solid var(--card-border);
+	border-radius: 12px;
+	padding: 14px;
+}
+
+.toast {
+	animation: toastSlideIn 0.25s ease;
+	display: flex;
+	align-items: center;
+	gap: 10px;
+	padding: 12px 14px;
+	border-radius: 10px;
+	background: var(--card-bg);
+	border: 1px solid var(--input-border);
+	border-left: 3px solid var(--accent);
+	box-shadow: 0 8px 24px rgba(0, 0, 0, 0.35);
+	font-size: 13px;
+	line-height: 1.4;
+	color: var(--text);
 }
 
 .App {
@@ -171,18 +269,18 @@ a {
 }
 
 .App-header {
-	background-color: var(--discord-gray-1);
+	background-color: var(--bg);
 	min-height: 100vh;
 	display: flex;
 	flex-direction: column;
 	align-items: center;
 	justify-content: center;
 	font-size: calc(10px + 2vmin);
-	color: var(--discord-white);
+	color: var(--text);
 }
 
 .App-link {
-	color: var(--discord-blue);
+	color: var(--accent);
 }
 
 @keyframes App-logo-spin {

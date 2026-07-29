@@ -8,16 +8,32 @@ interface HighLimitSliderEntryProps {
 
 const HighLimitSliderEntry: React.FC<HighLimitSliderEntryProps> = ({ label, value, onChange }) => {
 	return (
-		<div style={{ marginBottom: '20px', display: 'flex', alignItems: 'center' }}>
-			<label
+		<div>
+			<div
 				style={{
-					color: 'var(--discord-white)',
-					marginRight: '10px',
-					width: '27%'
+					display: 'flex',
+					justifyContent: 'space-between',
+					alignItems: 'center',
+					fontSize: '12.5px',
+					color: 'var(--text-secondary)',
+					marginBottom: '6px'
 				}}
 			>
-				{label}:
-			</label>
+				<span>{label}</span>
+				<input
+					type="text"
+					value={value}
+					onChange={(e) => {
+						const inputValue = e.target.value
+						const intValue = parseInt(inputValue, 10)
+						if (!isNaN(intValue)) {
+							onChange(intValue)
+						}
+					}}
+					className="field-input"
+					style={{ width: '70px', flexShrink: 0, fontFamily: 'ui-monospace, Menlo, monospace', padding: '6px 8px' }}
+				/>
+			</div>
 			<input
 				type="range"
 				value={value}
@@ -25,36 +41,7 @@ const HighLimitSliderEntry: React.FC<HighLimitSliderEntryProps> = ({ label, valu
 				onChange={(e) => onChange(parseInt(e.target.value, 10))}
 				min={0}
 				max={2000} // Set a higher max value
-				style={{
-					backgroundColor: 'transparent',
-					width: '60%',
-					height: '50%'
-				}}
-			/>
-			<div
-				style={{
-					color: 'var(--discord-white)',
-					width: '3%'
-				}}
-			></div>
-			<input
-				type="text"
-				value={value}
-				onChange={(e) => {
-					const inputValue = e.target.value
-					const intValue = parseInt(inputValue, 10)
-					if (!isNaN(intValue)) {
-						onChange(intValue)
-					}
-				}}
-				min={0}
-				max={2000} // Set a higher max value
-				style={{
-					backgroundColor: 'var(--discord-gray-3)',
-					color: 'var(--discord-white)',
-					border: 'none',
-					width: '10%'
-				}}
+				style={{ accentColor: 'var(--accent)', width: '100%' }}
 			/>
 		</div>
 	)

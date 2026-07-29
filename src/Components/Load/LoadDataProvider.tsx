@@ -1,4 +1,4 @@
-import React, { createContext, useState, useContext, ReactNode } from 'react'
+import React, { createContext, useState, useContext, useCallback, useMemo, ReactNode } from 'react'
 
 interface LoadDataContextType {
 	loadData: any | null
@@ -23,27 +23,34 @@ const LoadDataProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
 	const [loadData, setLoadData] = useState<any | null>(null)
 	const [listeners, setListeners] = useState<((message: string, color: string) => void)[]>([])
 
-	const addWarning = (message: string) => {
-		listeners.forEach((listener) => listener(message, 'orange'))
-	}
-
-	const addCustomMessage = (message: string, color: string) => {
-		listeners.forEach((listener) => listener(message, color))
-	}
-
-	const registerWarningListener = (callback: (message: string, color: string) => void) => {
-		setListeners((prevListeners) => [...prevListeners, callback])
-	}
-
-	const clearWarningListeners = () => {
-		setListeners([])
-	}
-
-	return (
-		<LoadDataContext.Provider value={{ loadData, setLoadData, addWarning, addCustomMessage, registerWarningListener, clearWarningListeners }}>
-			{children}
-		</LoadDataContext.Provider>
+	const addWarning = useCallback(
+		(message: string) => {
+			listeners.forEach((listener) => listener(message, 'orange'))
+		},
+		[listeners]
 	)
+
+	const addCustomMessage = useCallback(
+		(message: string, color: string) => {
+			listeners.forEach((listener) => listener(message, color))
+		},
+		[listeners]
+	)
+
+	const registerWarningListener = useCallback((callback: (message: string, color: string) => void) => {
+		setListeners((prevListeners) => [...prevListeners, callback])
+	}, [])
+
+	const clearWarningListeners = useCallback(() => {
+		setListeners([])
+	}, [])
+
+	const contextValue = useMemo(
+		() => ({ loadData, setLoadData, addWarning, addCustomMessage, registerWarningListener, clearWarningListeners }),
+		[loadData, addWarning, addCustomMessage, registerWarningListener, clearWarningListeners]
+	)
+
+	return <LoadDataContext.Provider value={contextValue}>{children}</LoadDataContext.Provider>
 }
 
 export default LoadDataProvider

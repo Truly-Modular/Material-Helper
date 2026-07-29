@@ -39,70 +39,55 @@ const IntegerSliderEntry: React.FC<IntegerSliderEntryProps> = ({
 		}
 	}
 
-	return (
-		<div style={{ marginBottom: "20px", display: "flex", alignItems: "center" }}>
-			{editableLabel ? (
+	const rangeInput = (
+		<input
+			type="range"
+			value={value}
+			defaultValue={value}
+			onChange={(e) => {
+				onChange(parseInt(e.target.value, 10))
+			}}
+			min={0}
+			max={5}
+			style={{ accentColor: "var(--accent)", flex: 1, width: "100%" }}
+		/>
+	)
+
+	const textInput = (
+		<input
+			type="text"
+			value={text}
+			onChange={(e) => {
+				textParse(e.target.value)
+			}}
+			className="field-input"
+			style={{ width: editableLabel ? "64px" : "70px", flexShrink: 0, fontFamily: "ui-monospace, Menlo, monospace", padding: "6px 8px" }}
+		/>
+	)
+
+	if (editableLabel) {
+		return (
+			<div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
 				<input
 					type="text"
-					style={{
-						backgroundColor: "var(--discord-gray-3)",
-						color: "var(--discord-white)",
-						border: "none",
-						width: "21%",
-						marginRight: "10px",
-					}}
 					value={label}
-					onChange={(event) => {
-						onLabelChange?.(event.target.value)
-					}}
+					onChange={(event) => onLabelChange?.(event.target.value)}
+					className="field-input"
+					style={{ width: "120px", flexShrink: 0, padding: "6px 8px", fontSize: "12px" }}
 				/>
-			) : (
-				<label
-					style={{
-						color: "var(--discord-white)",
-						marginRight: "10px",
-						width: "27%",
-					}}
-				>
-					{label}:
-				</label>
-			)}
-			<input
-				type="range"
-				value={value}
-				defaultValue={value}
-				onChange={(e) => {
-					onChange(parseInt(e.target.value, 10))
-				}}
-				min={0}
-				max={5}
-				style={{
-					backgroundColor: "transparent",
-					width: editableLabel ? "62%" : "60%",
-					height: "50%",
-				}}
-			/>
-			<div
-				style={{
-					color: "var(--discord-white)",
-					width: "3%",
-				}}
-			></div>
-			<input
-				type="text"
-				value={text}
-				onChange={(e) => {
-					textParse(e.target.value)
-				}}
-				min={0}
-				max={15}
-				style={{
-					backgroundColor: "var(--discord-gray-3)",
-					color: "var(--discord-white)",
-					border: "none",
-					width: "10%",
-				}}
-			/>
+				{rangeInput}
+				{textInput}
+			</div>
+		)
+	}
+
+	return (
+		<div>
+			<div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", fontSize: "12.5px", color: "var(--text-secondary)", marginBottom: "6px" }}>
+				<span>{label}</span>
+				{textInput}
+			</div>
+			{rangeInput}
 		</div>
 	)
 }

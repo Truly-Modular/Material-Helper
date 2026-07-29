@@ -97,25 +97,25 @@ const FileUpload: React.FC<UploadButtonProps> = ({ onWarning, is121Plus }) => {
 	}
 
 	const buttonStyle = {
-		padding: '0 12px',
-		margin: '5px',
-		backgroundColor: '#7289DA',
-		color: '#ffffff',
-		border: 'none',
-		borderRadius: '5px',
+		padding: '0 14px',
+		margin: '0',
+		backgroundColor: 'var(--input-bg)',
+		color: 'var(--text)',
+		border: '1px solid var(--input-border)',
+		borderRadius: '7px',
 		cursor: 'pointer',
 		display: 'inline-flex',
 		alignItems: 'center',
 		justifyContent: 'center',
-		fontSize: '13px',
+		fontSize: '12.5px',
 		fontFamily: 'inherit',
 		fontWeight: 600,
 		lineHeight: 1.1,
-		minHeight: '42px',
-		height: '42px',
-		minWidth: '180px',
-		width: '180px',
-		maxWidth: '180px',
+		minHeight: '36px',
+		height: '36px',
+		minWidth: '150px',
+		width: '150px',
+		maxWidth: '150px',
 		boxSizing: 'border-box' as const,
 		whiteSpace: 'nowrap',
 		textAlign: 'center' as const,
@@ -123,15 +123,15 @@ const FileUpload: React.FC<UploadButtonProps> = ({ onWarning, is121Plus }) => {
 		textOverflow: 'ellipsis'
 	} as const
 
-	useEffect(() => {
-		// Register the warning listener
-		registerWarningListener(onWarning)
+	// useEffect(() => {
+	// 	// Register the warning listener
+	// 	registerWarningListener(onWarning)
 
-		// I prob should de-register this again
-		return () => {
-			clearWarningListeners()
-		}
-	}, [clearWarningListeners, onWarning, registerWarningListener])
+	// 	// I prob should de-register this again
+	// 	return () => {
+	// 		clearWarningListeners()
+	// 	}
+	// }, [clearWarningListeners, onWarning, registerWarningListener])
 
 	useEffect(() => {
 		setApiEntries([])
@@ -526,20 +526,24 @@ const FileUpload: React.FC<UploadButtonProps> = ({ onWarning, is121Plus }) => {
 								background: 'transparent',
 								border: 'none',
 								padding: '4px 0',
-								color: '#f2f2f2',
-								fontWeight: 600,
+								color: 'var(--accent)',
+								fontWeight: 700,
+								textTransform: 'uppercase',
+								letterSpacing: '.06em',
 								textAlign: 'left',
 								cursor: 'pointer',
 								display: 'flex',
 								alignItems: 'center',
 								gap: '6px',
 								fontFamily: 'inherit',
-								fontSize: '13px'
+								fontSize: '11px'
 							}}
 						>
-							<span style={{ color: '#b9bbbe', width: '12px', display: 'inline-block' }}>{isExpanded ? '▾' : '▸'}</span>
+							<span style={{ color: 'var(--text-muted)', width: '12px', display: 'inline-block' }}>{isExpanded ? '▾' : '▸'}</span>
 							<span>{node.name}</span>
-							<span style={{ color: '#b9bbbe', fontSize: '12px', marginLeft: '6px' }}>{node.path}</span>
+							<span style={{ color: 'var(--text-muted)', fontSize: '11px', marginLeft: '6px', textTransform: 'none', letterSpacing: 'normal', fontWeight: 400 }}>
+								{node.path}
+							</span>
 						</button>
 						{isExpanded && (
 							<div style={{ display: 'flex', flexDirection: 'column', gap: '4px', marginTop: '4px' }}>{renderTree(node.children, depth + 1)}</div>
@@ -568,21 +572,21 @@ const FileUpload: React.FC<UploadButtonProps> = ({ onWarning, is121Plus }) => {
 					}}
 					disabled={isDisabledEntry}
 					style={{
-						background: isDisabledEntry ? '#2b2f36' : '#36393f',
-						color: isDisabledEntry ? '#9aa0a6' : '#fff',
-						border: isDisabledEntry ? '1px dashed #4f545c' : '1px solid #4f545c',
-						borderRadius: '6px',
-						padding: '6px 8px',
+						background: isDisabledEntry ? '#1d1f23' : 'var(--input-bg)',
+						color: isDisabledEntry ? 'var(--text-muted)' : 'var(--text)',
+						border: isDisabledEntry ? '1px dashed var(--input-border)' : '1px solid var(--input-border)',
+						borderRadius: '7px',
+						padding: '7px 9px',
 						textAlign: 'left',
 						cursor: isDisabledEntry ? 'not-allowed' : 'pointer',
 						marginLeft: depth * 8,
-						fontSize: '13px',
+						fontSize: '12.5px',
 						opacity: isDisabledEntry ? 0.85 : 1
 					}}
 				>
-					<strong>{node.materialId || `miapi:${node.path.replace(/\.json$/, '')}`}</strong>
-					<span style={{ color: isDisabledEntry ? '#b0b3b8' : '#b9bbbe', display: 'block', fontSize: '12px' }}>{node.path}</span>
-					{isDisabledEntry && <span style={{ color: '#d8d8d8', display: 'block', fontSize: '11px', marginTop: '2px' }}>Child material</span>}
+					<div style={{ fontWeight: 600 }}>{node.materialId || `miapi:${node.path.replace(/\.json$/, '')}`}</div>
+					<div style={{ color: 'var(--text-muted)', fontSize: '11px' }}>{node.path}</div>
+					{isDisabledEntry && <div style={{ color: 'var(--text-muted)', fontSize: '11px', marginTop: '2px' }}>Child material</div>}
 				</button>
 			)
 		})
@@ -595,7 +599,7 @@ const FileUpload: React.FC<UploadButtonProps> = ({ onWarning, is121Plus }) => {
 	return (
 		<div>
 			<form onSubmit={handleSubmit} style={{ display: 'flex', alignItems: 'center', flexWrap: 'wrap' }}>
-				<label style={buttonStyle}>
+				<label style={{...buttonStyle, marginRight: "10px"}}>
 					Load From File
 					<input type="file" onChange={handleFileChange} style={{ display: 'none' }} />
 				</label>
@@ -623,14 +627,14 @@ const FileUpload: React.FC<UploadButtonProps> = ({ onWarning, is121Plus }) => {
 								gap: '6px',
 								padding: '10px',
 								borderRadius: '10px',
-								backgroundColor: '#2f3136',
-								border: '1px solid #3a3f4b',
-								boxShadow: '0 8px 18px rgba(0, 0, 0, 0.35)'
+								backgroundColor: 'var(--card-bg)',
+								border: '1px solid var(--input-border)',
+								boxShadow: '0 12px 28px rgba(0, 0, 0, 0.45)'
 							}}
 						>
 							{isScanning ? (
 								<div
-									style={{ color: '#d7d7d7', fontSize: '12px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '8px' }}
+									style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: "8px", color: '#d7d7d7', fontSize: '12px', width: "100%" }}
 								>
 									<div>
 										Scanning examples
@@ -638,30 +642,9 @@ const FileUpload: React.FC<UploadButtonProps> = ({ onWarning, is121Plus }) => {
 											? ` • detected ${scanProgress.detected}/${scanProgress.total} • downloaded ${scanProgress.downloaded}`
 											: ' • fetching metadata…'}
 									</div>
-									<button
-										type="button"
-										onClick={(event) => {
-											event.preventDefault()
-											event.stopPropagation()
-											clearMaterialCaches()
-										}}
-										style={{
-											background: '#40444b',
-											border: '1px solid #575d67',
-											borderRadius: '999px',
-											color: '#f2f2f2',
-											cursor: 'pointer',
-											fontSize: '11px',
-											fontFamily: 'inherit',
-											padding: '4px 8px',
-											lineHeight: 1
-										}}
-									>
-										Clear cache
-									</button>
 								</div>
 							) : (
-								<div style={{ color: '#d7d7d7', fontSize: '12px' }}>
+								<div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: "8px", color: '#d7d7d7', fontSize: '12px', width: "100%" }}>
 									Available examples
 									{scanProgress.total > 0 ? ` • detected ${scanProgress.detected}/${scanProgress.total}` : ' (cached locally)'}
 									<button
@@ -680,7 +663,8 @@ const FileUpload: React.FC<UploadButtonProps> = ({ onWarning, is121Plus }) => {
 											fontSize: '11px',
 											fontFamily: 'inherit',
 											padding: '4px 8px',
-											lineHeight: 1
+											lineHeight: 1,
+											marginLeft: "auto"
 										}}
 									>
 										Clear cache
@@ -693,7 +677,7 @@ const FileUpload: React.FC<UploadButtonProps> = ({ onWarning, is121Plus }) => {
 						</div>
 					)}
 				</div>
-				<span style={{ color: '#d6d6d6', marginLeft: '6px' }}>{filename}</span>
+				<span style={{ color: 'var(--text-muted)', fontSize: '12px', marginLeft: '6px' }}>{filename}</span>
 			</form>
 		</div>
 	)

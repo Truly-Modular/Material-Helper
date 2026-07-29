@@ -15,48 +15,40 @@ const StringStatEntry: React.FC<StringStatEntryProps> = ({
 	editableLabel,
 	onLabelChange,
 }) => {
-	return (
-		<div style={{ marginBottom: "20px", width: "100%", display: "flex", alignItems: "center" }}>
-			{editableLabel ? (
+	const valueInput = (
+		<input
+			type="text"
+			value={value}
+			defaultValue={value}
+			onChange={(e) => {
+				onChange(e.target.value)
+			}}
+			className="field-input"
+			style={{ flex: 1, fontFamily: "ui-monospace, Menlo, monospace", fontSize: "12.5px", padding: editableLabel ? "6px 8px" : undefined }}
+		/>
+	)
+
+	if (editableLabel) {
+		return (
+			<div style={{ display: "flex", alignItems: "center", gap: "10px", width: "100%" }}>
 				<input
 					type="text"
-					style={{
-						backgroundColor: "var(--discord-gray-3)",
-						color: "var(--discord-white)",
-						border: "none",
-						width: "28%",
-						marginRight: "10px",
-					}}
 					value={label}
-					onChange={(event) => {
-						onLabelChange?.(event.target.value)
-					}}
+					onChange={(event) => onLabelChange?.(event.target.value)}
+					className="field-input"
+					style={{ width: "120px", flexShrink: 0, padding: "6px 8px", fontSize: "12px" }}
 				/>
-			) : (
-				<label
-					style={{
-						color: "var(--discord-white)",
-						marginRight: "10px",
-						width: "27%",
-					}}
-				>
-					{label}:
-				</label>
-			)}
-			<input
-				type="text"
-				value={value}
-				defaultValue={value}
-				onChange={(e) => {
-					onChange(e.target.value)
-				}}
-				style={{
-					backgroundColor: "var(--discord-gray-3)",
-					color: "var(--discord-white)",
-					border: "none",
-					width: "100%",
-				}}
-			/>
+				{valueInput}
+			</div>
+		)
+	}
+
+	return (
+		<div>
+			<div style={{ fontSize: "12.5px", color: "var(--text-secondary)", marginBottom: "6px", display: "flex", justifyContent: "space-between" }}>
+				<span>{label}</span>
+			</div>
+			{valueInput}
 		</div>
 	)
 }

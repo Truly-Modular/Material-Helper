@@ -50,22 +50,20 @@ const MaterialGroups: React.FC<MaterialGroupsProps> = ({ onSubmit }) => {
 		onSubmit(validDisplayNames)
 	}
 
+	const removeGroup = (index: number) => {
+		const next = displayNames.filter((_, i) => i !== index)
+		setDisplayNames(next)
+		onSubmit(next)
+	}
+
 	useEffect(() => {
 		// Trigger onSubmit when the component mounts with the default entry
 		onSubmit(displayNames)
 	}, []) // eslint-disable-line react-hooks/exhaustive-deps
 
 	return (
-		<div
-			className="entry"
-			style={{
-				position: 'relative',
-				backgroundColor: 'var(--discord-gray-2)',
-				borderRadius: '8px',
-				padding: '10px'
-			}}
-		>
-			<label htmlFor="materialGroupsInput" style={{ display: 'block', color: 'var(--discord-white)', marginBottom: '5px' }}>
+		<div>
+			<label htmlFor="materialGroupsInput" className="field-label">
 				Material Groups
 			</label>
 			<input
@@ -84,16 +82,19 @@ const MaterialGroups: React.FC<MaterialGroupsProps> = ({ onSubmit }) => {
 						setDisplayNames((prevNames) => [...prevNames, ''])
 					}
 				}}
-				style={{
-					backgroundColor: 'var(--discord-gray-3)',
-					color: 'var(--discord-white)',
-					border: 'none',
-					width: '90%',
-					padding: '10px',
-					borderRadius: '8px',
-					outline: 'none' // Remove the default focus outline
-				}}
+				className="field-input"
+				style={{ marginBottom: '8px' }}
 			/>
+			<div style={{ display: 'flex', flexWrap: 'wrap', gap: '6px' }}>
+				{displayNames.map((name, index) => (
+					<div key={index} className="chip">
+						<span>{name}</span>
+						<button type="button" onClick={() => removeGroup(index)}>
+							×
+						</button>
+					</div>
+				))}
+			</div>
 		</div>
 	)
 }
