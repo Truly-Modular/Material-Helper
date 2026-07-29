@@ -350,6 +350,8 @@ const AppContent: React.FC = () => {
 		<div>
 			<header
 				style={{
+					position: "sticky",
+					top: 0,
 					display: 'flex',
 					flexWrap: 'wrap',
 					alignItems: 'center',
