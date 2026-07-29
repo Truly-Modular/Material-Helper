@@ -7,6 +7,19 @@ interface WarningProps {
 	color: string
 }
 
+const dotColorFor = (color: string): string => {
+	switch (color) {
+		case "red":
+			return "var(--red)"
+		case "green":
+			return "var(--green)"
+		case "orange":
+			return "var(--orange)"
+		default:
+			return color || "var(--accent)"
+	}
+}
+
 const Warning: React.FC<WarningProps> = ({ id, message, onRemove, color }) => {
 	useEffect(() => {
 		const timeoutId = setTimeout(() => {
@@ -17,15 +30,15 @@ const Warning: React.FC<WarningProps> = ({ id, message, onRemove, color }) => {
 	}, [id, onRemove])
 
 	return (
-		<div
-			style={{
-				backgroundColor: color,
-				color: "white",
-				padding: "10px",
-				marginBottom: "5px",
-			}}
-		>
-			{message}
+		<div className="toast">
+			<div style={{ width: "8px", height: "8px", borderRadius: "50%", flexShrink: 0, background: dotColorFor(color) }}></div>
+			<div style={{ flex: 1, whiteSpace: "pre-wrap" }}>{message}</div>
+			<button
+				onClick={() => onRemove(id)}
+				style={{ background: "none", border: "none", color: "var(--text-muted)", cursor: "pointer", fontSize: "16px", lineHeight: 1, padding: 0 }}
+			>
+				×
+			</button>
 		</div>
 	)
 }

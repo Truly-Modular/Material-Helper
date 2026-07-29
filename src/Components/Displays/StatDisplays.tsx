@@ -36,10 +36,8 @@ const StatBoxComponent: React.FC<StatBox> = ({ sliderValues, colorPalette, trans
 	}
 
 	return (
-		<div id="display">
-			<div style={{ display: 'flex', gap: '20px' }}>
-				<div id="display-list" style={{ flex: 1 }}>
-					<CustomComponent
+		<div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+			<CustomComponent
 						imageProps={{
 							imageUrl: process.env.PUBLIC_URL + '/images/sword.png',
 							colorPalette: colorPalette
@@ -70,8 +68,6 @@ const StatBoxComponent: React.FC<StatBox> = ({ sliderValues, colorPalette, trans
 							{ text: 'Mining Speed  : ' + sliderValues.mining_speed }
 						]}
 					/>
-				</div>
-				<div id="display-list" style={{ flex: 2 }}>
 					<CustomComponent
 						imageProps={{
 							imageUrl: process.env.PUBLIC_URL + '/images/helmet.png',
@@ -80,7 +76,7 @@ const StatBoxComponent: React.FC<StatBox> = ({ sliderValues, colorPalette, trans
 						headerText={translation + 'Helmet'}
 						lines={[
 							{
-								text: 'Armor                : ' + Math.floor(sliderValues.hardness / 2).toFixed(2)
+								text: 'Armor                  : ' + Math.floor(sliderValues.hardness / 2).toFixed(2)
 							},
 							{
 								text:
@@ -112,7 +108,7 @@ const StatBoxComponent: React.FC<StatBox> = ({ sliderValues, colorPalette, trans
 						headerText={translation + 'Chestplate'}
 						lines={[
 							{
-								text: 'Armor                : ' + (sliderValues.hardness + 2 - Math.ceil(sliderValues.flexibility / 4)).toFixed(2)
+								text: 'Armor                  : ' + (sliderValues.hardness + 2 - Math.ceil(sliderValues.flexibility / 4)).toFixed(2)
 							},
 							{
 								text:
@@ -145,7 +141,7 @@ const StatBoxComponent: React.FC<StatBox> = ({ sliderValues, colorPalette, trans
 						lines={[
 							{
 								text:
-									'Armor                : ' +
+									'Armor                  : ' +
 									(((sliderValues.hardness - Math.ceil(sliderValues.hardness / 6.5) + Math.ceil(sliderValues.hardness / 4.5) - 1) / 7) * 7).toFixed(2)
 							},
 							{
@@ -178,7 +174,7 @@ const StatBoxComponent: React.FC<StatBox> = ({ sliderValues, colorPalette, trans
 						headerText={translation + 'Boots'}
 						lines={[
 							{
-								text: 'Armor                : ' + Math.floor(sliderValues.hardness / 2 - Math.floor(sliderValues.density / 4)).toFixed(2)
+								text: 'Armor                  : ' + Math.floor(sliderValues.hardness / 2 - Math.floor(sliderValues.density / 4)).toFixed(2)
 							},
 							{
 								text:
@@ -202,8 +198,6 @@ const StatBoxComponent: React.FC<StatBox> = ({ sliderValues, colorPalette, trans
 							}
 						]}
 					/>
-				</div>
-			</div>
 		</div>
 	)
 }

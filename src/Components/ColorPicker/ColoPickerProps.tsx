@@ -43,44 +43,50 @@ const ColorPicker: React.FC<ColorPickerProps> = ({ initialColor, onChange, disab
 	}
 
 	return (
-		<div style={{ position: 'relative', display: 'inline-block' }} ref={colorPickerRef}>
-			<div
-				style={{
-					backgroundColor: color,
-					width: '40px',
-					height: '40px',
-					cursor: disabled ? 'not-allowed' : 'pointer',
-					filter: disabled ? 'grayscale(100%)' : 'none',
-					opacity: disabled ? 0.5 : 1
-				}}
-				onClick={handleColorClick}
-			/>
-			{showPicker && !disabled && (
+		<div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '5px' }}>
+			<div style={{ position: 'relative', display: 'inline-block' }} ref={colorPickerRef}>
 				<div
 					style={{
-						position: 'absolute',
-						zIndex: 2,
-						top: '50px', // Adjust the position as needed
-						left: '0'
+						backgroundColor: color,
+						width: '42px',
+						height: '42px',
+						borderRadius: '8px',
+						border: '1px solid var(--input-border)',
+						cursor: disabled ? 'not-allowed' : 'pointer',
+						filter: disabled ? 'grayscale(100%)' : 'none',
+						opacity: disabled ? 0.5 : 1
 					}}
-				>
-					<SketchPicker color={color} onChange={handleColorChange} />
-				</div>
-			)}
-			{disabled && (
-				<div
-					style={{
-						position: 'absolute',
-						top: 0,
-						left: 0,
-						width: '100%',
-						height: '100%',
-						backgroundColor: 'rgba(128, 128, 128, 0.5)',
-						zIndex: 1,
-						pointerEvents: 'none'
-					}}
+					onClick={handleColorClick}
 				/>
-			)}
+				{showPicker && !disabled && (
+					<div
+						style={{
+							position: 'absolute',
+							zIndex: 2,
+							top: '50px', // Adjust the position as needed
+							left: '0'
+						}}
+					>
+						<SketchPicker color={color} onChange={handleColorChange} />
+					</div>
+				)}
+				{disabled && (
+					<div
+						style={{
+							position: 'absolute',
+							top: 0,
+							left: 0,
+							width: '100%',
+							height: '100%',
+							borderRadius: '8px',
+							backgroundColor: 'rgba(128, 128, 128, 0.5)',
+							zIndex: 1,
+							pointerEvents: 'none'
+						}}
+					/>
+				)}
+			</div>
+			<span style={{ fontSize: '10px', color: 'var(--text-muted)', fontFamily: 'ui-monospace, Menlo, monospace' }}>{color}</span>
 		</div>
 	)
 }

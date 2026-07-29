@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from 'react'
+import React, { useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react'
 import MaterialEntry from './Components/TextInputs/MaterialId'
 import MaterialDisplayName from './Components/TextInputs/MaterialDisplayName'
 import SliderEntry from './Components/Sliders/SliderEntry'
@@ -128,10 +128,6 @@ const AppContent: React.FC = () => {
 		setColorPalette(colors)
 	}
 
-	const hasPropertyContent = (field: 'properties' | 'display_properties' | 'hidden_properties') => {
-		return Object.keys(propertyFields[field]).length > 0
-	}
-
 	const handlePropertyFieldSubmit = (field: 'properties' | 'display_properties' | 'hidden_properties') => {
 		return (value: Record<string, unknown>) => {
 			setPropertyFields((prev) => ({
@@ -155,42 +151,6 @@ const AppContent: React.FC = () => {
 		}))
 	}
 
-	const buttonStyle = {
-		padding: '10px',
-		margin: '5px',
-		backgroundColor: '#7289DA', // Discord's primary blue color
-		color: '#ffffff', // Discord's white color
-		border: 'none',
-		borderRadius: '5px',
-		cursor: 'pointer'
-	}
-
-	const rootStyle = {
-		'--button-background': '#7289DA', // Discord's primary blue color
-		'--button-text-color': '#ffffff' // Discord's white color
-	}
-
-	const floatingToggleBoxStyle = {
-		display: 'flex',
-		flexDirection: 'column' as const,
-		gap: '8px',
-		padding: '10px',
-		borderRadius: '10px',
-		backgroundColor: '#2f3136',
-		border: '1px solid #3a3f4b',
-		color: '#ffffff',
-		minWidth: '280px',
-		boxShadow: '0 4px 12px rgba(0, 0, 0, 0.25)'
-	}
-
-	const floatingToggleRowStyle = {
-		display: 'flex',
-		alignItems: 'center',
-		justifyContent: 'flex-start',
-		gap: '10px',
-		padding: '6px 0'
-	}
-
 	const loadedPropertyFields = useMemo(
 		() => ({
 			properties: loadData?.properties && typeof loadData.properties === 'object' && !Array.isArray(loadData.properties) ? loadData.properties : {},
@@ -205,12 +165,6 @@ const AppContent: React.FC = () => {
 		}),
 		[loadData]
 	)
-
-	const hasAnyPropertySectionEnabled = Object.values(enabledPropertyFields).some(Boolean)
-	const hasAnyPropertyContent = (['properties', 'display_properties', 'hidden_properties'] as const).some(
-		(field) => hasPropertyContent(field) || Object.keys(loadedPropertyFields[field]).length > 0
-	)
-	const shouldShowPropertySection = hasAnyPropertySectionEnabled || hasAnyPropertyContent
 
 	useEffect(() => {
 		if (!loadData) {
@@ -258,11 +212,7 @@ const AppContent: React.FC = () => {
 		}
 
 		// Add files
-		if (is121Plus) {
-			materialFolder?.file(displayID + '.json', JSON.stringify(generateMaterialObject())) // Add your file content here
-		} else {
-			materialFolder?.file(displayID + '.json', JSON.stringify(generateMaterialObject())) // Add your file content here
-		}
+		materialFolder?.file(displayID + '.json', JSON.stringify(generateMaterialObject()))
 		zip?.file('pack.mcmeta', JSON.stringify(mcMeta))
 
 		// Generate ZIP file
@@ -366,152 +316,195 @@ const AppContent: React.FC = () => {
 		addWarning('Successfully Copied! You might want to use a command block!', '#fcba03')
 	}
 
+	// Height sync: keep the Properties panel's min-height matching the left
+	// column's overflow past the preview cards, mirroring the two-column layout.
+	const leftColRef = useRef<HTMLDivElement>(null)
+	const previewsBlockRef = useRef<HTMLDivElement>(null)
+	const [propertiesMinHeight, setPropertiesMinHeight] = useState(0)
+
+	useLayoutEffect(() => {
+		const leftEl = leftColRef.current
+		const previewsEl = previewsBlockRef.current
+		if (!leftEl || !previewsEl) {
+			return
+		}
+
+		const sync = () => {
+			const leftHeight = leftEl.getBoundingClientRect().height
+			const previewsHeight = previewsEl.getBoundingClientRect().height
+			const target = Math.max(0, Math.round(leftHeight - previewsHeight - 14))
+			setPropertiesMinHeight((prev) => (Math.abs(prev - target) > 2 ? target : prev))
+		}
+
+		const observer = new ResizeObserver(sync)
+		observer.observe(leftEl)
+		observer.observe(previewsEl)
+		sync()
+
+		return () => observer.disconnect()
+	}, [])
+
+	const propertyFieldOrder = ['properties', 'display_properties', 'hidden_properties'] as const
+
 	return (
 		<div>
-			<div className="Top-banner">
-				<div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', gap: '10px' }}>
-					<a
-						style={{
-							display: 'flex',
-							alignItems: 'center',
-							justifyContent: 'center',
-							color: 'white',
-							fontWeight: 'bold'
-						}}
-						href={'https://modrinth.com/organization/truly-modular'}
-						target="_blank"
-						rel="noreferrer"
-					>
-						<img src={process.env.PUBLIC_URL + '/logo_trans.png'} alt="Truly Modular logo" width={40} height={40} />
-						<span>Truly Modular Material Helper</span>
-					</a>
-					<div
-						style={{
-							display: 'flex',
-							alignItems: 'center',
-							gap: '10px',
-							fontSize: '16pt',
-							transform: 'scale(75%)'
-						}}
-					>
-						<span>1.20.1</span>
-						<ToggleButton isToggled={is121Plus} setIsToggled={setIs121Plus} />
-						<span>1.21+</span>
-					</div>
-				</div>
-				<div>
-					<FileUpload
-						onWarning={(warning, color) => {
-							addWarning(warning, color)
-						}}
-						is121Plus={is121Plus}
-					></FileUpload>
-				</div>
-				<div style={{ ...rootStyle, display: 'flex', flexDirection: 'row' }}>
-					<button style={buttonStyle} onClick={() => generateResourcePack()}>
-						Download Data Pack
-					</button>
-					<button style={buttonStyle} onClick={() => generateMaterialJSON()}>
-						Download Material Json
-					</button>
-					<button style={buttonStyle} onClick={() => generateMaterialJSONAndCopy()}>
-						Copy Json to Clipboard
-					</button>
-					<button style={buttonStyle} onClick={() => handleGiveButtonPress()}>
-						Copy /give Command
-					</button>
-				</div>
-			</div>
-
-			<div
+			<header
 				style={{
+					position: "sticky",
+					top: 0,
+					zIndex: 99,
 					display: 'flex',
-					flexDirection: 'row',
-					padding: '20px',
-					gap: '20px'
+					flexWrap: 'wrap',
+					alignItems: 'center',
+					gap: '16px',
+					justifyContent: 'space-between',
+					padding: '18px 28px',
+					background: 'var(--card-bg)',
+					borderBottom: '1px solid var(--card-border)'
 				}}
 			>
-				<div id="entry-list">
-					<div style={{ display: 'flex', gap: '20px' }}>
-						<div>
-							<h1>Details</h1>
-							<div style={{ display: 'flex', flexDirection: 'column', gap: '5px' }}>
-								<div style={{ display: 'flex', gap: '5px' }}>
-									<MaterialEntry onSubmit={(entryText) => setMaterialId(entryText)} />
-									<MaterialDisplayName onSubmit={(entryText) => setMaterialDisplayName(entryText)} />
-								</div>
-								<MaterialGroups onSubmit={handleMaterialGroupsSubmit} />
-							</div>
-						</div>
-						<ColorPickerGroup
-							initialColors={colorPalette}
-							onSubmit={handleColorPaletteSubmit}
-							setColorAutoGenerate={setIsAutoGenerateColors}
-							autoGenerateColors={isAutoGenerateColors}
-						/>
+				<a
+					href="https://modrinth.com/organization/truly-modular"
+					target="_blank"
+					rel="noreferrer"
+					style={{ display: 'flex', alignItems: 'center', gap: '12px', color: 'var(--text)' }}
+				>
+					<img
+						src={process.env.PUBLIC_URL + '/logo_trans.png'}
+						alt="Truly Modular logo"
+						width={36}
+						height={36}
+						style={{ borderRadius: '6px' }}
+					/>
+					<div style={{ display: 'flex', flexDirection: 'column', lineHeight: 1.2 }}>
+						<span style={{ fontWeight: 700, fontSize: '15px' }}>Truly Modular</span>
+						<span style={{ fontSize: '12px', color: 'var(--text-muted)' }}>Material Helper</span>
 					</div>
+				</a>
 
-					<div style={{ display: 'flex', gap: '20px', alignItems: 'flex-start' }}>
-						<div style={{ display: 'flex', flexDirection: 'column', gap: '20px', flex: '1 1 420px', alignItems: 'stretch' }}>
-							<div>
-								<h1>Stats</h1>
-								<SliderEntry onSubmit={handleSliderSubmit} is121Plus={is121Plus} setIs121Plus={setIs121Plus} />
-							</div>
-							{shouldShowPropertySection && (
-								<div
-									className="property-section"
-									style={{ width: '100%', maxWidth: '560px', display: 'flex', flexDirection: 'column', alignItems: 'stretch', gap: '10px' }}
-								>
-									<h2 className="section-heading">Properties</h2>
-									{(['properties', 'display_properties', 'hidden_properties'] as const)
-										.filter(
-											(field) => enabledPropertyFields[field] || hasPropertyContent(field) || Object.keys(loadedPropertyFields[field]).length > 0
-										)
-										.map((field) => (
-											<PropertyComponent
-												key={field}
-												label={field}
-												initialValue={loadedPropertyFields[field] as Record<string, unknown>}
-												onSubmit={handlePropertyFieldSubmit(field)}
-											/>
-										))}
-								</div>
-							)}
-						</div>
-						<div style={{ flex: '0 0 420px' }}>
-							<h1>Previews</h1>
-							{isAutoGenerateColors && (
-								<div style={{ marginBottom: '5px', color: 'var(--warning-red)', fontWeight: 'bold' }}>
-									Previews aren't representing ingame colors anymore, since automatic generation is toggled!
-								</div>
-							)}
-							<StatBoxComponent sliderValues={sliderValues} colorPalette={colorPalette} translation={materialDisplayName} is121={is121Plus} />
-						</div>
-					</div>
+				<div className="segmented-control">
+					<button
+						onClick={() => setIs121Plus(false)}
+						style={{ background: !is121Plus ? 'var(--accent)' : 'transparent', color: !is121Plus ? 'var(--accent-text)' : 'var(--text-secondary)' }}
+					>
+						1.20.1
+					</button>
+					<button
+						onClick={() => setIs121Plus(true)}
+						style={{ background: is121Plus ? 'var(--accent)' : 'transparent', color: is121Plus ? 'var(--accent-text)' : 'var(--text-secondary)' }}
+					>
+						1.21+
+					</button>
 				</div>
-				<div style={{ position: 'fixed', top: 100, right: 15, zIndex: 9999, display: 'flex', flexDirection: 'column', gap: '8px' }}>
-					<div style={floatingToggleBoxStyle}>
-						<div style={{ fontSize: '12px', textTransform: 'uppercase', letterSpacing: '0.08em', color: '#b9bbbe', marginBottom: '4px' }}>
-							Toggles
+
+				<FileUpload
+					onWarning={(warning, color) => {
+						addWarning(warning, color)
+					}}
+					is121Plus={is121Plus}
+				/>
+
+				<div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
+					<button className="header-button header-button-primary" onClick={() => generateResourcePack()}>
+						Download Data Pack
+					</button>
+					<button className="header-button" onClick={() => generateMaterialJSON()}>
+						Download JSON
+					</button>
+					<button className="header-button" onClick={() => generateMaterialJSONAndCopy()}>
+						Copy JSON
+					</button>
+					<button className="header-button" onClick={() => handleGiveButtonPress()}>
+						Copy /give
+					</button>
+				</div>
+			</header>
+
+			<main
+				className="main-grid"
+				style={{
+					display: 'grid',
+					gap: '22px',
+					padding: '24px 28px 60px',
+					alignItems: 'start'
+				}}
+			>
+				<div ref={leftColRef} style={{ display: 'flex', flexDirection: 'column', gap: '22px', minWidth: 0 }}>
+					<section className="card-section">
+						<h2 className="section-heading" style={{ marginBottom: '14px' }}>
+							Details
+						</h2>
+						<div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '14px', marginBottom: '14px' }}>
+							<MaterialEntry onSubmit={(entryText) => setMaterialId(entryText)} />
+							<MaterialDisplayName onSubmit={(entryText) => setMaterialDisplayName(entryText)} />
 						</div>
-						{is121Plus && (
-							<div style={floatingToggleRowStyle}>
-								<ToggleButton isToggled={generateConverters} setIsToggled={setGenerateConverters} />
-								<span style={{ fontWeight: 600, color: '#ffffff' }}>Generate converters</span>
+						<MaterialGroups onSubmit={handleMaterialGroupsSubmit} />
+					</section>
+
+					<ColorPickerGroup
+						initialColors={colorPalette}
+						onSubmit={handleColorPaletteSubmit}
+						setColorAutoGenerate={setIsAutoGenerateColors}
+						autoGenerateColors={isAutoGenerateColors}
+					/>
+
+					<section className="card-section">
+						<div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '14px' }}>
+							<h2 className="section-heading">Stats</h2>
+							{is121Plus && (
+								<label style={{ display: 'flex', alignItems: 'center', gap: '8px', cursor: 'pointer' }}>
+									<span style={{ fontSize: '12.5px', color: 'var(--text-secondary)' }}>Generate converters</span>
+									<ToggleButton isToggled={generateConverters} setIsToggled={setGenerateConverters} size="lg" />
+								</label>
+							)}
+						</div>
+						<SliderEntry onSubmit={handleSliderSubmit} is121Plus={is121Plus} setIs121Plus={setIs121Plus} />
+					</section>
+				</div>
+
+				<div style={{ display: 'flex', flexDirection: 'column', gap: '14px', minWidth: 0 }}>
+					<div ref={previewsBlockRef} style={{ boxSizing: 'border-box', display: 'flex', flexDirection: 'column', gap: '14px' }}>
+						{isAutoGenerateColors && (
+							<div
+								style={{
+									color: 'var(--orange)',
+									fontSize: '12.5px',
+									fontWeight: 600,
+									background: 'var(--input-bg)',
+									border: '1px solid var(--input-border)',
+									borderRadius: '8px',
+									padding: '10px 12px'
+								}}
+							>
+								Previews aren't representing in-game colors anymore, since automatic generation is toggled!
 							</div>
 						)}
-						{(['properties', 'display_properties', 'hidden_properties'] as const).map((field) => (
-							<div key={field} style={floatingToggleRowStyle}>
-								<ToggleButton isToggled={enabledPropertyFields[field]} setIsToggled={() => togglePropertyField(field)} />
-								<span style={{ textTransform: 'capitalize', fontWeight: 600, color: '#ffffff' }}>{field}</span>
-							</div>
-						))}
+						<StatBoxComponent sliderValues={sliderValues} colorPalette={colorPalette} translation={materialDisplayName} is121={is121Plus} />
 					</div>
-					{warnings.map((warning) => (
-						<Warning key={warning.id} id={warning.id} message={warning.message} onRemove={removeWarning} color={warning.color} />
-					))}
+
+					<section
+						className="card-section"
+						style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}
+					>
+						<h2 className="section-heading" style={{userSelect: 'none'}}>Properties</h2>
+						{propertyFieldOrder.map((field) => (
+							<PropertyComponent
+								key={field}
+								label={field}
+								initialValue={loadedPropertyFields[field] as Record<string, unknown>}
+								onSubmit={handlePropertyFieldSubmit(field)}
+								enabled={enabledPropertyFields[field]}
+								onToggle={() => togglePropertyField(field)}
+							/>
+						))}
+					</section>
 				</div>
-				<div style={{ display: 'flex', flexDirection: 'column', gap: '35px' }}></div>
+			</main>
+
+			<div style={{ position: 'fixed', bottom: '20px', right: '20px', zIndex: 9999, display: 'flex', flexDirection: 'column', gap: '8px', maxWidth: '340px' }}>
+				{warnings.map((warning) => (
+					<Warning key={warning.id} id={warning.id} message={warning.message} onRemove={removeWarning} color={warning.color} />
+				))}
 			</div>
 		</div>
 	)
