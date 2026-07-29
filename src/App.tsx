@@ -352,6 +352,7 @@ const AppContent: React.FC = () => {
 				style={{
 					position: "sticky",
 					top: 0,
+					zIndex: 99,
 					display: 'flex',
 					flexWrap: 'wrap',
 					alignItems: 'center',
