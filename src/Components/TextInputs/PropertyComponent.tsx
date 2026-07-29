@@ -47,6 +47,12 @@ const PropertyComponent: React.FC<PropertyComponentProps> = ({ label, descriptio
 		requestAnimationFrame(resizeTextarea)
 	}, [initialValue])
 
+	useEffect(() => {
+		if (enabled) {
+			requestAnimationFrame(resizeTextarea)
+		}
+	}, [enabled])
+
 	const helperText = useMemo(() => {
 		if (description) {
 			return description
