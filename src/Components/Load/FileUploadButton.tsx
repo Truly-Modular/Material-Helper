@@ -30,6 +30,7 @@ const FileUpload: React.FC<UploadButtonProps> = ({ onWarning, is121Plus }) => {
 	const [isScanning, setIsScanning] = useState(false)
 	const [showApiEntries, setShowApiEntries] = useState(false)
 	const [expandedFolders, setExpandedFolders] = useState<Record<string, boolean>>({})
+	const [scanProgress, setScanProgress] = useState({ detected: 0, total: 0, downloaded: 0 })
 	const apiMenuRef = useRef<HTMLDivElement>(null)
 
 	const { registerWarningListener, clearWarningListeners } = useLoadData()
@@ -37,6 +38,63 @@ const FileUpload: React.FC<UploadButtonProps> = ({ onWarning, is121Plus }) => {
 	const versionLabel = is121Plus ? '1.21' : '1.20'
 	const apiCacheKey = `miapi-material-scan-cache-v1:${versionLabel}`
 	const apiFileCacheKey = `miapi-material-file-cache-v1:${versionLabel}`
+	const githubFetch = async (url: string, init?: RequestInit) =>
+		fetch(url, {
+			...init,
+			headers: {
+				...(init?.headers ?? {})
+			},
+			mode: 'cors',
+			credentials: 'omit'
+		})
+
+	const getRateLimitWarning = async (response: Response): Promise<string | null> => {
+		const remaining = Number(response.headers.get('x-ratelimit-remaining') ?? 'Infinity')
+		const resetAt = response.headers.get('x-ratelimit-reset')
+		const resetTime = resetAt ? new Date(Number(resetAt) * 1000).toLocaleTimeString() : 'soon'
+
+		let bodyMessage = ''
+		try {
+			const bodyText = await response.clone().text()
+			if (bodyText) {
+				const parsed = JSON.parse(bodyText) as { message?: unknown }
+				if (typeof parsed.message === 'string') {
+					bodyMessage = parsed.message
+				}
+			}
+		} catch {
+			// Ignore non-JSON bodies and fall back to the header-based check.
+		}
+
+		if (bodyMessage.toLowerCase().includes('rate limit exceeded') || response.status === 403 || response.status === 429 || remaining <= 0) {
+			return 'GitHub rate limit exceeded'
+		}
+
+		return null
+	}
+
+	const MAX_CONCURRENCY = 8
+
+	const runWithConcurrency = async <T,>(tasks: Array<() => Promise<T>>, limit: number): Promise<T[]> => {
+		const results: T[] = new Array(tasks.length)
+		let nextIndex = 0
+
+		await Promise.all(
+			Array.from({ length: Math.min(limit, tasks.length) }, async () => {
+				while (true) {
+					const currentIndex = nextIndex
+					nextIndex += 1
+					if (currentIndex >= tasks.length) {
+						return
+					}
+
+					results[currentIndex] = await tasks[currentIndex]()
+				}
+			})
+		)
+
+		return results
+	}
 
 	const buttonStyle = {
 		padding: '0 14px',
@@ -65,15 +123,15 @@ const FileUpload: React.FC<UploadButtonProps> = ({ onWarning, is121Plus }) => {
 		textOverflow: 'ellipsis'
 	} as const
 
-	useEffect(() => {
-		// Register the warning listener
-		registerWarningListener(onWarning)
+	// useEffect(() => {
+	// 	// Register the warning listener
+	// 	registerWarningListener(onWarning)
 
-		// I prob should de-register this again
-		return () => {
-			clearWarningListeners()
-		}
-	}, [registerWarningListener])
+	// 	// I prob should de-register this again
+	// 	return () => {
+	// 		clearWarningListeners()
+	// 	}
+	// }, [clearWarningListeners, onWarning, registerWarningListener])
 
 	useEffect(() => {
 		setApiEntries([])
@@ -102,7 +160,7 @@ const FileUpload: React.FC<UploadButtonProps> = ({ onWarning, is121Plus }) => {
 	}
 
 	const fileUpdate = (selectedFile: File | undefined) => {
-		if (selectedFile == undefined) {
+		if (selectedFile === undefined) {
 			console.log('file is not defined!')
 		}
 		selectedFile?.text().then((text: string) => {
@@ -128,7 +186,8 @@ const FileUpload: React.FC<UploadButtonProps> = ({ onWarning, is121Plus }) => {
 			return null
 		}
 
-		const match = document.cookie.match(new RegExp(`(?:^|; )${name.replace(/([.$?*|{}()[\]\\/\+^])/g, '\\$1')}=([^;]*)`))
+		const escapedName = name.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
+		const match = document.cookie.match(new RegExp(`(?:^|; )${escapedName}=([^;]*)`))
 		return match ? decodeURIComponent(match[1]) : null
 	}
 
@@ -171,6 +230,29 @@ const FileUpload: React.FC<UploadButtonProps> = ({ onWarning, is121Plus }) => {
 		localStorage.setItem(cacheKey, payload)
 	}
 
+	const clearMaterialCaches = () => {
+		const prefixes = [`${apiCacheKey}:`, `${apiFileCacheKey}:`]
+
+		for (const key of Object.keys(localStorage)) {
+			if (prefixes.some((prefix) => key.startsWith(prefix))) {
+				localStorage.removeItem(key)
+			}
+		}
+
+		for (const cookie of document.cookie.split(';')) {
+			const cookieName = cookie.split('=')[0]?.trim()
+			if (cookieName && prefixes.some((prefix) => cookieName.startsWith(prefix))) {
+				document.cookie = `${cookieName}=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT; SameSite=Lax`
+			}
+		}
+
+		setApiEntries([])
+		setShowApiEntries(false)
+		setExpandedFolders({})
+		setScanProgress({ detected: 0, total: 0, downloaded: 0 })
+		onWarning('Cleared cached material examples and scan data.', 'green')
+	}
+
 	const getFolderPriority = (name: string) => {
 		const lower = name.toLowerCase()
 		if (lower.includes('wood')) return 0
@@ -191,12 +273,35 @@ const FileUpload: React.FC<UploadButtonProps> = ({ onWarning, is121Plus }) => {
 		return keys.length === 2 && keys.includes('parent') && keys.includes('data')
 	}
 
+	const countMaterialFiles = async (item: any): Promise<number> => {
+		if (item.type === 'file' && item.name.endsWith('.json')) {
+			return 1
+		}
+
+		if (item.type === 'dir') {
+			const dirResponse = await githubFetch(item.url)
+			if (!dirResponse.ok) {
+				return 0
+			}
+
+			const dirEntries = await dirResponse.json()
+			const counts = await Promise.all(dirEntries.map((child: any) => countMaterialFiles(child)))
+			return counts.reduce((sum, count) => sum + count, 0)
+		}
+
+		return 0
+	}
+
 	const scanGitHubMaterials = async (): Promise<ApiMaterialEntry[]> => {
 		const branch = getRepoBranch()
 		const path = getRepoMaterialsPath()
 		const url = `https://api.github.com/repos/Truly-Modular/Modular-Item-API/contents/${path}?ref=${branch}`
 
-		const response = await fetch(url)
+		const response = await githubFetch(url)
+		const rateLimitWarning = await getRateLimitWarning(response)
+		if (rateLimitWarning) {
+			throw new Error(rateLimitWarning)
+		}
 		if (!response.ok) {
 			throw new Error(`GitHub API request failed (${response.status})`)
 		}
@@ -204,65 +309,77 @@ const FileUpload: React.FC<UploadButtonProps> = ({ onWarning, is121Plus }) => {
 		const entries = await response.json()
 		const collected: ApiMaterialEntry[] = []
 		const sortedEntries = [...entries].sort((a, b) => getFolderPriority(a.name) - getFolderPriority(b.name) || a.name.localeCompare(b.name))
+		const totalMaterials = (await Promise.all(sortedEntries.map((entry) => countMaterialFiles(entry)))).reduce((sum, count) => sum + count, 0)
 
-		const visit = async (item: any) => {
+		setScanProgress({ detected: 0, total: totalMaterials, downloaded: 0 })
+
+		const visit = async (item: any): Promise<ApiMaterialEntry[]> => {
 			if (item.type === 'file' && item.name.endsWith('.json')) {
 				const relativePath = item.path.replace(/^.*?\/materials\//, '').replace(/\\/g, '/')
 
 				try {
-					const response = await fetch(item.download_url, {
-						headers: { 'User-Agent': 'Material-Helper' }
-					})
+					const response = await githubFetch(item.download_url)
+					const rateLimitWarning = await getRateLimitWarning(response)
+					if (rateLimitWarning) {
+						throw new Error(rateLimitWarning)
+					}
 					if (!response.ok) {
 						console.warn(`Skipping file ${item.path} due to status ${response.status}`)
-						return
+						return []
 					}
 
 					const parsed = await response.json()
 					const isChildMaterial = isPureParentDataTemplate(parsed)
-
-					collected.push({
+					const entry: ApiMaterialEntry = {
 						path: relativePath,
 						materialId: `miapi:${relativePath.replace(/\.json$/, '')}`,
 						downloadUrl: item.download_url,
 						isChildMaterial
-					})
+					}
+
+					collected.push(entry)
+					setScanProgress((prev) => ({ ...prev, detected: prev.detected + 1 }))
+					return [entry]
 				} catch (error) {
 					console.warn(`Failed to inspect material file ${item.path}`, error)
+					return []
 				}
-
-				return
 			}
 
 			if (item.type === 'dir') {
 				try {
-					const dirResponse = await fetch(item.url, {
-						headers: { 'User-Agent': 'Material-Helper' }
-					})
+					const dirResponse = await githubFetch(item.url)
+					const rateLimitWarning = await getRateLimitWarning(dirResponse)
+					if (rateLimitWarning) {
+						throw new Error(rateLimitWarning)
+					}
 					if (!dirResponse.ok) {
 						console.warn(`Skipping folder ${item.path} due to status ${dirResponse.status}`)
-						return
+						return []
 					}
 
 					const dirEntries = await dirResponse.json()
-					for (const child of dirEntries) {
-						await visit(child)
-					}
+					const nestedResults = await runWithConcurrency<ApiMaterialEntry[]>(
+						dirEntries.map((child: any) => () => visit(child)),
+						MAX_CONCURRENCY
+					)
+					return nestedResults.flat()
 				} catch (error) {
 					console.warn(`Failed to scan folder ${item.path}`, error)
+					return []
 				}
 			}
+
+			return []
 		}
 
-		for (const entry of sortedEntries) {
-			try {
-				await visit(entry)
-			} catch (error) {
-				console.warn(`Failed to scan entry ${entry.path}`, error)
-			}
-		}
+		const visited = await runWithConcurrency<ApiMaterialEntry[]>(
+			sortedEntries.map((entry) => () => visit(entry)),
+			MAX_CONCURRENCY
+		)
+		const flattened = visited.flat()
 
-		return collected.sort((a, b) => a.path.localeCompare(b.path))
+		return flattened.sort((a, b) => a.path.localeCompare(b.path))
 	}
 
 	const handleLoadFromApi = async () => {
@@ -276,7 +393,8 @@ const FileUpload: React.FC<UploadButtonProps> = ({ onWarning, is121Plus }) => {
 		}
 
 		setIsScanning(true)
-		setShowApiEntries(false)
+		setShowApiEntries(true)
+		setScanProgress({ detected: 0, total: 0, downloaded: 0 })
 
 		const runScan = async () => {
 			try {
@@ -294,7 +412,8 @@ const FileUpload: React.FC<UploadButtonProps> = ({ onWarning, is121Plus }) => {
 				onWarning(`Loaded ${items.length} material examples from the live API path.`, 'green')
 			} catch (error) {
 				console.error(error)
-				onWarning('Could not scan the live material API path.', 'red')
+				const message = error instanceof Error ? error.message : 'Could not scan the live material API path.'
+				onWarning(message, 'red')
 			} finally {
 				setIsScanning(false)
 			}
@@ -312,7 +431,12 @@ const FileUpload: React.FC<UploadButtonProps> = ({ onWarning, is121Plus }) => {
 			let materialText = cachedText
 
 			if (!materialText) {
-				const response = await fetch(entry.downloadUrl)
+				const response = await githubFetch(entry.downloadUrl)
+				const rateLimitWarning = await getRateLimitWarning(response)
+				if (rateLimitWarning) {
+					onWarning('Github Rate Limit Warning: ' + rateLimitWarning, 'red')
+					throw new Error(rateLimitWarning)
+				}
 				if (!response.ok) {
 					throw new Error('Failed to fetch example material JSON')
 				}
@@ -323,10 +447,12 @@ const FileUpload: React.FC<UploadButtonProps> = ({ onWarning, is121Plus }) => {
 			const parsed = JSON.parse(materialText)
 			setLoadData(parsed)
 			setFileName(entry.materialId)
+			setScanProgress((prev) => ({ ...prev, downloaded: prev.downloaded + 1 }))
 			onWarning(`Loaded example material: ${entry.materialId}`, 'green')
 		} catch (error) {
 			console.error(error)
-			onWarning('Could not load the selected API material example.', 'red')
+			const message = error instanceof Error ? error.message : 'Could not load the selected API material example.'
+			onWarning(message, 'red')
 		}
 	}
 
@@ -487,7 +613,7 @@ const FileUpload: React.FC<UploadButtonProps> = ({ onWarning, is121Plus }) => {
 									? 'Show API Examples'
 									: 'Load From API'}
 					</button>
-					{apiEntries.length > 0 && showApiEntries && (
+					{showApiEntries && (
 						<div
 							style={{
 								position: 'absolute',
@@ -506,7 +632,45 @@ const FileUpload: React.FC<UploadButtonProps> = ({ onWarning, is121Plus }) => {
 								boxShadow: '0 12px 28px rgba(0, 0, 0, 0.45)'
 							}}
 						>
-							<div style={{ color: 'var(--text-muted)', fontSize: '11.5px', padding: '2px 4px 6px' }}>Available examples (cached locally):</div>
+							{isScanning ? (
+								<div
+									style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: "8px", color: '#d7d7d7', fontSize: '12px', width: "100%" }}
+								>
+									<div>
+										Scanning examples
+										{scanProgress.total > 0
+											? ` • detected ${scanProgress.detected}/${scanProgress.total} • downloaded ${scanProgress.downloaded}`
+											: ' • fetching metadata…'}
+									</div>
+								</div>
+							) : (
+								<div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: "8px", color: '#d7d7d7', fontSize: '12px', width: "100%" }}>
+									Available examples
+									{scanProgress.total > 0 ? ` • detected ${scanProgress.detected}/${scanProgress.total}` : ' (cached locally)'}
+									<button
+										type="button"
+										onClick={(event) => {
+											event.preventDefault()
+											event.stopPropagation()
+											clearMaterialCaches()
+										}}
+										style={{
+											background: '#40444b',
+											border: '1px solid #575d67',
+											borderRadius: '999px',
+											color: '#f2f2f2',
+											cursor: 'pointer',
+											fontSize: '11px',
+											fontFamily: 'inherit',
+											padding: '4px 8px',
+											lineHeight: 1,
+											marginLeft: "auto"
+										}}
+									>
+										Clear cache
+									</button>
+								</div>
+							)}
 							<div style={{ display: 'flex', flexDirection: 'column', gap: '4px', maxHeight: '320px', overflowY: 'auto' }}>
 								{renderTree(materialTree)}
 							</div>

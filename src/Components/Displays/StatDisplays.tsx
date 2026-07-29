@@ -18,8 +18,6 @@ const StatBoxComponent: React.FC<StatBox> = ({ sliderValues, colorPalette, trans
 	}
 
 	function customPower(x: number, exp: number): number {
-		console.log(JSON.stringify(sliderValues))
-		console.log('logging')
 		// Handle negative values separately
 		if (x < 0) {
 			// Check if the exponent is a rational number with an odd numerator
