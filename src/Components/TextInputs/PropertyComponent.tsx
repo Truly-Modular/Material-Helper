@@ -34,14 +34,17 @@ const PropertyComponent: React.FC<PropertyComponentProps> = ({ label, descriptio
 			return
 		}
 
+		// Reset height to auto to measure scrollHeight
 		textarea.style.height = 'auto'
+		// Set height to scrollHeight to fit content
 		textarea.style.height = `${textarea.scrollHeight}px`
 	}
 
 	useEffect(() => {
 		const nextValue = initialValue && Object.keys(initialValue).length > 0 ? JSON.stringify(initialValue, null, 2) : '{}'
 		setTextValue(nextValue)
-		requestAnimationFrame(resizeTextarea)
+		// Use setTimeout to ensure DOM has rendered before measuring
+		setTimeout(resizeTextarea, 0)
 	}, [initialValue])
 
 	const helperText = useMemo(() => {
